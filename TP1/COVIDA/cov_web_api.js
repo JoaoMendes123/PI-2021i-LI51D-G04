@@ -1,4 +1,4 @@
-
+'strict'
 const services = require('./cov_services')
 
 module.exports = {
@@ -10,7 +10,7 @@ module.exports = {
     showGroup: showGroup,
     addToGroup: addToGroup,
     removeFromGroup: removeFromGroup,
-    getGamesBetween: getGamesBetween,
+    getGamesBetween: getGamesBetween
 }
 
 getPopularGames(req, rsp){
