@@ -12,7 +12,13 @@ const TWITCH_CLIENT_SECRET = "08k5wsc9g7znuwx9m1pvy5d7xw13lr"
 const app = express()
 app.use(express.json)
 app.get('/',checkAPI(req,res))
-app.get('/covida/games/search',cov_web_api)
+
+app.get('/covida/games/search',covApi.searchGames)
+app.post('/covida/groups',covApi.createGroup)
+app.put('/covida/groups/:id',covApi.editGroup)
+app.get('/covida/groups',covApi.listGroups)
+app.get('/covida/groups/:id',covApi.showGroup)
+app.post('/covida/groups/:id',covApi.addToGroup)
 
 app.listen(PORT, () => {
     console.log("server is running...")
