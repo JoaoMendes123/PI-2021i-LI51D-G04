@@ -42,7 +42,7 @@ module.exports = function (covServices) {
   }
 
   function addToGroup(req, rsp){
-      covServices.addToGroup(, req.params.id,)
+      //covServices.addToGroup(req., req.params.id,)
   }
 
   function removeFromGroup(req, rsp){
