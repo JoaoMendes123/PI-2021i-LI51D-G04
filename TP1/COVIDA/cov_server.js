@@ -1,19 +1,26 @@
 //Dependencies
-var express        = require('express')
+const express = require('express')
+const covDB = require('./cov_db')()
+const covServices = require('./cov_services')(covDB)
+const covApi = require('./cov_web_api')(covServices)
 
 //Constants
 const PORT = 8000
 const TWITCH_CLIENT_ID = "ko2c8v3hhmzujhpitxqgigsdzg0ay0"
-const TWITCH_CLIENT_SECRET = "x7pxjp119q2lkptgti88jq0ffc08gc"
-const SESSION_SECRET;
-const CALLBACK_URL = "http://localhost:3000/auth/twitch/callback"
+const TWITCH_CLIENT_SECRET = "08k5wsc9g7znuwx9m1pvy5d7xw13lr"
 
 const app = express()
-const routes = require('./cov_web_api')
-app.use(routes)
+app.use(express.json)
+app.get('/',checkAPI(req,res))
+app.get('/covida/games/search',cov_web_api)
 
 app.listen(PORT, () => {
     console.log("server is running...")
     if(process.send)
     process.send({ running: true })
   })
+
+function checkAPI(req,res){
+  console.log(req);
+  res.send('its working i think')
+}
