@@ -1,4 +1,5 @@
 'use strict'
+const igdb = require('./igdb-data')
 module.exports = function(covDB) {
     if(!covDB) {
       throw "Invalid covDB object"
@@ -17,7 +18,10 @@ module.exports = function(covDB) {
 
 
     function searchGames(str, callback){
-
+      console.log("cov.services")
+        igdb.searchGames(str, (err,games) => {
+          console.log(games)
+        })
     }
 
     function createGroup(name, desc, callback){
