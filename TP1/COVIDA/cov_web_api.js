@@ -17,9 +17,9 @@ module.exports = function (covServices) {
     function searchGames(req, rsp){
         console.log("web_api")
         console.log(req.query.name)
-      covServices.searchGames(req.query.name, () => {
-          console.log("done")
-      })
+        covServices.searchGames(req.query.name, games => { 
+            rsp.send(JSON.parse(games)); 
+        })
   }
 
   function createGroup(req, rsp){

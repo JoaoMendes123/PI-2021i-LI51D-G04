@@ -20,7 +20,7 @@ module.exports = function(covDB) {
     function searchGames(str, callback){
       console.log("cov.services")
         igdb.searchGames(str, (err,games) => {
-          console.log(games)
+          callback(games)
         })
     }
 

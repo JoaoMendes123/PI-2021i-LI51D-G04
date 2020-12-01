@@ -6,14 +6,11 @@ const covApi = require('./cov_web_api')(covServices)
 
 //Constants
 const PORT = 8000
-const TWITCH_CLIENT_ID = "ko2c8v3hhmzujhpitxqgigsdzg0ay0"
-const TWITCH_CLIENT_SECRET = "08k5wsc9g7znuwx9m1pvy5d7xw13lr"
-
 const app = express()
 app.use(express.json())
 app.get('/',checkAPI)
 
-app.get('/covida/games/search', covApi.searchGames)
+app.get('/covida/games/search/', covApi.searchGames)
 app.post('/covida/groups', covApi.createGroup)
 app.put('/covida/groups/:id', covApi.editGroup)
 app.get('/covida/groups', covApi.listGroups)
@@ -22,11 +19,13 @@ app.post('/covida/groups/:id', covApi.addToGroup)
 
 app.listen(PORT, () => {
     console.log("server is running...")
-    if(process.send)
-    process.send({ running: true })
   })
 
-function checkAPI(req,res){
-  console.log(req);
-  res.send('its working i think')
+function checkAPI(req,rsp){
+  console.log(req.path);
+  rsp.status(200).json({
+    "name": "COVIDA",
+    "version": "1.0.0",
+    "description": "Create and manage groups of games"
+  })
 }
