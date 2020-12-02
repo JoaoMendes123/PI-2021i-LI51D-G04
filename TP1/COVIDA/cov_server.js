@@ -1,4 +1,5 @@
 //Dependencies
+const bodyparser = require('body-parser')
 const express = require('express')
 const covDB = require('./cov_db')()
 const covServices = require('./cov_services')(covDB)
@@ -9,13 +10,15 @@ const PORT = 8000
 const app = express()
 app.use(express.json())
 app.get('/',checkAPI)
+app.use(bodyparser.text())
 
 app.get('/covida/games/search/', covApi.searchGames)
-app.post('/covida/groups', covApi.createGroup)
-app.put('/covida/groups/:id', covApi.editGroup)
-app.get('/covida/groups', covApi.listGroups)
-app.get('/covida/groups/:id', covApi.showGroup)
-app.post('/covida/groups/:id', covApi.addToGroup)
+app.post('/covida/groups/create', covApi.createGroup)
+app.put('/covida/groups/edit', covApi.editGroup)
+app.get('/covida/groups/list', covApi.listGroups)
+app.get('/covida/groups/show', covApi.showGroup)
+app.post('/covida/groups/add', covApi.addToGroup)
+app.delete('/covida/groups/remove', covApi.removeFromGroup)
 
 app.listen(PORT, () => {
     console.log("server is running...")

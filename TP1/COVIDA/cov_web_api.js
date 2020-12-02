@@ -46,11 +46,13 @@ module.exports = function (covServices) {
   }
 
   function addToGroup(req, rsp){
-      //covServices.addToGroup(req., req.params.id,)
+      const body = JSON.parse("{"+req.body+"}")
+      covServices.addToGroup(body.gameID, body.group, )
   }
 
   function removeFromGroup(req, rsp){
-
+    const body = JSON.parse("{"+req.body+"}")
+    covServices.removeFromGroup(body.gameID, body.group)
   }
 
   function getGamesBetween(req, rsp){

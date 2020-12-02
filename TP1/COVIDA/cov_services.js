@@ -40,8 +40,11 @@ module.exports = function(covDB) {
 
     }
 
-    function addToGroup(game, group, callback){
-
+    function addToGroup(id, group, callback){
+      igdb.getGame(id, (err, game) => {
+        covDB.addToGroup(group, game[0].name, game[0].id, game[0].totalrating)
+        callback(null)
+      })
     }
 
     function removeFromGroup(game, group, callback){
