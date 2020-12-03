@@ -25,7 +25,9 @@ module.exports = function(covDB) {
     }
 
     function createGroup(name, desc, callback){
-
+        covDB.createGroup(name, desc, (err, succ) => {
+            callback(succ)
+        })
     }
 
     function editGroup(group, name, desc, callback){
@@ -42,8 +44,10 @@ module.exports = function(covDB) {
 
     function addToGroup(id, group, callback){
       igdb.getGame(id, (err, game) => {
-        covDB.addToGroup(group, game[0].name, game[0].id, game[0].totalrating)
-        callback(null)
+        console.log(game)
+        covDB.addToGroup(group, game[0].name, game[0].id, game[0].total_rating, () => {
+          console.log("cona")
+        })
       })
     }
 

@@ -1,11 +1,11 @@
 'use strict'
 const fs = require('fs')
-const GROUPS_PATH = 'TP1/groups.json'
+const GROUPS_PATH = 'groups.json'
 module.exports = () => {
     
     function createGroup(group_name,group_description,cb){
         fs.readFile(GROUPS_PATH, (err, buffer) => {
-            if (err) cb(err)
+            if (err) return cb(err)
             let groups = buffer.length > 0 ? JSON.parse(buffer) : []
             if(groups.some(group => group.name === group_name))
                 return cb(new Error(`Can't create new group with ${group_name} because one already exists `))

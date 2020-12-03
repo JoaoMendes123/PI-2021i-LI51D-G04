@@ -23,7 +23,10 @@ module.exports = function (covServices) {
   }
 
   function createGroup(req, rsp){
-      
+      const body = JSON.parse("{"+req.body+"}")
+      covServices.createGroup(body.name, body.desc, () => {
+          rsp.send("Success")
+      })
   }
 
   function editGroup(req, rsp){
