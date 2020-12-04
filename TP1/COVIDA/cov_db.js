@@ -136,7 +136,7 @@ const GROUPS_PATH = 'groups.json'
             if(groups.find(group => group.name == group_name)){
                 groups.forEach(group => {
                     if(group.name == group_name && group.games.length != 0){
-                        var res = group.games.filter(game => game.rating >= low && game.rating <= high)
+                        var res = group.games.filter(game => game.total_rating >= low && game.total_rating <= high)
                         if(res.length >= 1) return cb(null,res)
                         else return cb(new Error(`No games fit in given rating interval`),null,404)
                     }else if(group.name == group_name && group.games.length == 0) return cb(new Error(`Group ${group.name} doesn't have any games in it`),null,404)
@@ -175,7 +175,7 @@ function sorted_game_insertion(group,game){
         for (let i = 1; i < group.games.length; i++) {
             let current = group.games[i];
             let j = i-1; 
-            while ((j > -1) && (current.rating > group.games[j].rating)) {
+            while ((j > -1) && (current.total_rating > group.games[j].total_rating || !group.games[j].total_rating )) {
                 group.games[j+1] = group.games[j];
                 j--;
             }

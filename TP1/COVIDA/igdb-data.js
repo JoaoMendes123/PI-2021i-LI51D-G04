@@ -11,7 +11,7 @@ module.exports = {
 }
 
 function searchGames(name, cb) {
-    const content = "fields name, rating, id; search \""+name+"\";"
+    const content = "fields name, total_rating, id; search \""+name+"\";"
     const options = {
         hostname : 'api.igdb.com',
         path: '/v4/games/',
