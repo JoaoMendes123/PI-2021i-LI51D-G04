@@ -26,27 +26,34 @@ module.exports = function(covDB) {
 
     function createGroup(name, desc, callback){
         covDB.createGroup(name, desc, (err, succ) => {
-            callback(succ)
+            callback(err, succ)
         })
     }
 
     function editGroup(group, name, desc, callback){
-
+        covDB.editGroup(group, name, desc, (err, succ) => {
+            callback(err, succ)
+        })
     }
 
     function listGroups(callback){
-
+        covDB.listGroups((err, group) => {
+            console.log(group)
+            callback(group)
+        })
     }
 
     function showGroup(group, callback){
-
+        covDB.showGroup(group, (err,succ) => {
+            callback(err, succ)
+        })
     }
 
     function addToGroup(id, group, callback){
       igdb.getGame(id, (err, game) => {
         console.log(game)
-        covDB.addToGroup(group, game[0].name, game[0].id, game[0].total_rating, () => {
-          console.log("cona")
+        covDB.addToGroup(group, game, (err, succ) => {
+            callback(err, succ)
         })
       })
     }

@@ -1,0 +1,34 @@
+[
+    {
+        "name": "conta",
+        "description": "ola",
+        "games": [
+            {
+                "name": "The Witcher 3: Wild Hunt",
+                "id": 1942,
+                "rating": 93.67216655864405
+            }
+        ]
+    },
+    {
+        "name": "gr2",
+        "description": "adeus",
+        "games": [
+            {
+                "name": "Infamous: Second Son",
+                "id": 1941,
+                "rating": 79.15993379009959
+            }
+        ]
+    },
+    {
+        "name": "gr3",
+        "description": "grrrr",
+        "games": []
+    },
+    {
+        "name": "gr4",
+        "description": "grrrrrr",
+        "games": []
+    }
+]

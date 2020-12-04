@@ -30,7 +30,8 @@ function searchGames(name, cb) {
             console.log(`body = ${games}`);
         }) 
         res.on('close', () =>{
-            cb(null, games) 
+            if(games.length > 0) cb(null, games) 
+            else cb(new Error(`No matches found on the search for ${name}`))
         })     
     })
     req.on('error', error =>{
