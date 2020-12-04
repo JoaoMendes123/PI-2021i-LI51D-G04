@@ -1,7 +1,6 @@
 'use strict'
 const fs = require('fs')
-const GROUPS_PATH = 'TP1/groups.json'
-module.exports = () => {
+const GROUPS_PATH = 'groups.json'
     /**
      * 
      * @param {Name of the group being created} group_name 
@@ -10,13 +9,13 @@ module.exports = () => {
      */
     function createGroup(group_name,group_description,cb){
         fs.readFile(GROUPS_PATH, (err, buffer) => {
-            if (err) return cb(`Error Reading: ${err}`)
+            if(err) return cb(new Error(`Cant read  ${err}`),null,500)
             let groups = buffer.length > 0 ? JSON.parse(buffer) : []
             if(groups.some(group => group.name === group_name))
-                return cb(new Error(`Can't create new group with ${group_name} because one already exists `))
+                return cb(new Error(`Can't create new group with ${group_name} because one already exists `),null,409)
             groups.push(new Group(group_name,group_description,[]))
             fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                if (err) {return cb(`Error Writing: ${err}`)}
+                if(err) {return cb(new Error(`Error Writing: ${err}`),null,500)}
                 cb(null)
             })
         })
@@ -29,20 +28,22 @@ module.exports = () => {
      */
     function addToGroup(group_name,game,cb){
         fs.readFile(GROUPS_PATH, 'utf8', (err, buffer) => {
-            if (err)return cb(err)
+            if(err)return cb(new Error(`Cant read  ${err}`),500)
+            if(buffer.length == 0) return cb(new Error(`There are no groups, create one first`),404)
             var groups = JSON.parse(buffer)
+            if(!game.name) return cb(new Error(`No such game found, make sure the ID is correct`),406)
             if(groups.find(group => group.name === group_name)){
                 groups.forEach(group => {  
                     if(group.name == group_name){
-                        if(group.games.find(g => g.id == game.id)) return cb(new Error(`Can't add ${game.name} to group because it's already present`))
+                        if(group.games.find(g => g.id == game.id)) return cb(new Error(`Can't add ${game.name} to group ${group_name} because it's already present`),409)
                         group = sorted_game_insertion(group, game)
                         fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                            if (err) return cb(err)
+                            if(err) return cb(new Error(`Error Writing: ${err}`),500)
                             return cb(null)
                         })
                     }
                 })
-            }else return cb(new Error(`Can't find group with name:${group_name}`))
+            }else return cb(new Error(`Can't find group with name:${group_name}`),406)
         })
     }
     /**
@@ -51,9 +52,9 @@ module.exports = () => {
      */
     function listGroups(cb){
         fs.readFile(GROUPS_PATH, (err,buffer) => {
-            if(err) return cb(err)
+            if(err) return cb(new Error(`Cant read  ${err}`),null,500)
+            if(buffer.length == 0) return cb(new Error(`There are no groups to be listed, create one first`),null,404)
             var groups = JSON.parse(buffer)
-            if(groups.length == 0) return cb(new Error(`There are no groups to be listed, create one first`))
             cb(null,groups)
         })
     }
@@ -64,11 +65,12 @@ module.exports = () => {
      */
     function showGroup(group_name, cb){
         fs.readFile(GROUPS_PATH, (err,buffer) => {
-            if(err) return cb(err)
+            if(err) return cb(new Error(`Cant read  ${err}`),null,500)
+            if(buffer.length == 0) return cb(new Error(`There are no groups to be shown, create one first`),null,404)
             var groups = JSON.parse(buffer)
             var targetGroup = groups.find(group => group.name === group_name)
             if(targetGroup) return cb(null,targetGroup)
-            else cb(new Error(`Can't find group with name ${group_name}`))
+            else cb(new Error(`Can't find group with name ${group_name}`),null,406)
         })
     }
     /**
@@ -80,17 +82,18 @@ module.exports = () => {
      */
     function editGroup(group_name, name_update, description_update, cb){
         fs.readFile(GROUPS_PATH, (err, buffer) => {
-            if(err) return cb(`Cant read  ${err}`)
+            if(err) return cb(new Error(`Cant read  ${err}`),null,500)
+            if(buffer.length == 0) return cb(new Error(`There are no groups to be edited, create one first`),null,404)
             var groups = JSON.parse(buffer)
             let targetGroup = groups.findIndex(group => group.name === group_name)
             if(targetGroup != -1){
                 groups[targetGroup].name = name_update? name_update : groups[targetGroup].name
                 groups[targetGroup].description = description_update?  description_update : groups[targetGroup].description 
                 fs.writeFile(GROUPS_PATH, JSON.stringify(groups,null,`\t`), (err) => {
-                    if(err) return cb(err)
+                    if(err) return cb(new Error(`Error Writing: ${err}`),null,500)
                     cb(null,groups[targetGroup])
                 })
-            }else return cb(new Error(`There is no group with name ${group_name}`))
+            }else return cb(new Error(`There is no group with name ${group_name}`),null,406)
         })
     }
     /**
@@ -101,21 +104,22 @@ module.exports = () => {
      */
     function removeFromGroup(group_name,game,cb){
         fs.readFile(GROUPS_PATH,(err,buffer)=>{
-            if(err) return cb(new Error(`Cant read  ${err}`))
+            if(err) return cb(new Error(`Cant read  ${err}`), 500)
             var groups = JSON.parse(buffer)
+            if(buffer.length == 0) return cb(new Error(`There are no groups to remove, create one first`),404)
             if(groups.find(group => group.name = group_name)){
                 groups.forEach(group => {
                     if(group.name == group_name){
                         let target_index = group.games.findIndex(g => g.name == game.name)
-                        if(target_index == -1) return cb(new Error(`Couldn't find game ${game.name} in group ${group.name}`))
+                        if(target_index == -1) return cb(new Error(`Couldn't find game ${game.name} in group ${group.name}`),409)
                         group.games.splice(target_index, 1)
                         fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                            if (err) {return cb(new Error(`Error Writing: ${err}`))}
+                            if(err) {return cb(new Error(`Error Writing: ${err}`),500)}
                             cb(null)
                         })
                     }
                 })  
-            }else return cb(new Error(`There is no group with name ${group_name}`))
+            }else return cb(new Error(`There is no group with name ${group_name}`),406)
         })
     }
     /**
@@ -127,20 +131,20 @@ module.exports = () => {
      */
     function getGamesBetween(group_name,high,low,cb){
         fs.readFile(GROUPS_PATH,(err,buffer) => {
-            if(err) return cb(new Error(`Error reading: ${err}`))
+            if(err) return cb(new Error(`Error reading: ${err}`),null,500)
             var groups = JSON.parse(buffer)
             if(groups.find(group => group.name == group_name)){
                 groups.forEach(group => {
                     if(group.name == group_name && group.games.length != 0){
                         var res = group.games.filter(game => game.rating >= low && game.rating <= high)
                         if(res.length >= 1) return cb(null,res)
-                        else return cb(new Error(`No games fit in given rating interval`))
-                    }else return cb(new Error(`Group ${group.name} doesn't have any games in it`))
+                        else return cb(new Error(`No games fit in given rating interval`),null,404)
+                    }else if(group.name == group_name && group.games.length == 0) return cb(new Error(`Group ${group.name} doesn't have any games in it`),null,404)
                 })
-            }else return cb(new Error(`There is no group with name ${group_name}`))
+            }else return cb(new Error(`There is no group with name ${group_name}`),null,500)
         })
     }
-    return {
+    module.exports = {
          createGroup: createGroup,
          addToGroup: addToGroup,
          listGroups: listGroups,
@@ -149,7 +153,7 @@ module.exports = () => {
          removeFromGroup: removeFromGroup,
          getGamesBetween: getGamesBetween
      }
-}
+
 
 function Group(group_name, group_description, games) {
     this.name = group_name,

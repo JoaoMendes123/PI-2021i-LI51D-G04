@@ -24,25 +24,22 @@ function searchGames(name, cb) {
     }
     var games = ''
     const req = http.request(options, (res) => {
-        console.log(`statusCode: ${res.statusCode}`)
         res.on('data', d => {
             games += d;
-            console.log(`body = ${games}`);
         }) 
         res.on('close', () =>{
-            if(games.length > 0) cb(null, games) 
-            else cb(new Error(`No matches found on the search for ${name}`))
+            if(games.length > 2) cb(null, games) 
+            else cb(new Error(`No matches found on the search for ${name}`), null, 404)
         })     
     })
     req.on('error', error =>{
-        console.error(error)
+        cb(error, null, 500)
     })
     req.write(content)
     req.end()
 }
 
 function getGame(id, cb){
-    console.log(id)
     const content = `fields name, total_rating, id; where id = ${id};`
     const options = {
         hostname : 'api.igdb.com',
@@ -56,16 +53,16 @@ function getGame(id, cb){
     }
     var game = ''
     const req = http.request(options, (res) => {
-        console.log(`statusCode: ${res.statusCode}`)
         res.on('data', d => {
             game += d;
         }) 
         res.on('close', () =>{
-            cb(null, JSON.parse(game)) 
+            if(res.statusCode == 200) cb(null, JSON.parse(game))
+            else cb(new Error(`Cannot find game ${id}, please make sure the ID is valid`), null, res.statusCode) 
         })     
     })
     req.on('error', error =>{
-        console.error(error)
+        cb(error, null, 500)
     })
     req.write(content)
     req.end()

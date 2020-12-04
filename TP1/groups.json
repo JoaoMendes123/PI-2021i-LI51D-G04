@@ -1,34 +1,51 @@
 [
-    {
-        "name": "conta",
-        "description": "ola",
-        "games": [
-            {
-                "name": "The Witcher 3: Wild Hunt",
-                "id": 1942,
-                "rating": 93.67216655864405
-            }
-        ]
-    },
-    {
-        "name": "gr2",
-        "description": "adeus",
-        "games": [
-            {
-                "name": "Infamous: Second Son",
-                "id": 1941,
-                "rating": 79.15993379009959
-            }
-        ]
-    },
-    {
-        "name": "gr3",
-        "description": "grrrr",
-        "games": []
-    },
-    {
-        "name": "gr4",
-        "description": "grrrrrr",
-        "games": []
-    }
+	{
+		"name": "11",
+		"description": "11",
+		"games": [
+			{
+				"id": 11,
+				"name": "Vampire: The Masquerade - Bloodlines",
+				"total_rating": 79.20924719543984
+			},
+			{
+				"id": 14,
+				"name": "Fallout 2",
+				"total_rating": 90.1814442388246
+			},
+			{
+				"id": 443,
+				"name": "Shogun: Total War - Mongol Invasion",
+				"total_rating": 81.60738776036659
+			},
+			{
+				"id": 65634,
+				"name": "Chou Gals! Kotobuki Ran 2"
+			},
+			{
+				"id": 1942,
+				"name": "The Witcher 3: Wild Hunt",
+				"total_rating": 93.67216655864405
+			},
+			{
+				"id": 666,
+				"name": "Delta Force",
+				"total_rating": 67.5601255266934
+			},
+			{
+				"id": 9999,
+				"name": "A-Train The 21st Century"
+			},
+			{
+				"id": 2323,
+				"name": "Pokémon Mystery Dungeon: Explorers of Sky",
+				"total_rating": 64.98579316392875
+			}
+		]
+	},
+	{
+		"name": "gr1",
+		"description": "",
+		"games": []
+	}
 ]

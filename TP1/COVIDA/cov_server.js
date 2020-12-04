@@ -1,7 +1,7 @@
 //Dependencies
 const bodyparser = require('body-parser')
 const express = require('express')
-const covDB = require('./cov_db')()
+const covDB = require('./cov_db')
 const covServices = require('./cov_services')(covDB)
 const covApi = require('./cov_web_api')(covServices)
 
@@ -19,6 +19,7 @@ app.get('/covida/groups/list', covApi.listGroups)
 app.get('/covida/groups/show', covApi.showGroup)
 app.post('/covida/groups/add', covApi.addToGroup)
 app.delete('/covida/groups/remove', covApi.removeFromGroup)
+app.get('/covida/groups/sort', covApi.getGamesBetween)
 
 app.listen(PORT, () => {
     console.log("server is running...")
