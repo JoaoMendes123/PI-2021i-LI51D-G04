@@ -20,7 +20,7 @@ module.exports = function (covServices) {
     
     function searchGames(req, rsp){
         if(!req.query.name) {
-            rsp.status(400).send(`Invalid query syntax, please make sure query params are according to the documentation.`)
+            rsp.status(422).send(`Invalid query syntax, please make sure query params are according to the documentation.`)
             return
         }
         covServices.searchGames(req.query.name, (err, games, status) => { 
@@ -33,7 +33,7 @@ module.exports = function (covServices) {
       const body = bodyParser(req, rsp)
       if(!body) return
       if(!body.groupName){
-        rsp.status(400).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
+        rsp.status(422).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
         return
       }
       covServices.createGroup(body.groupName, body.desc, (err, succ, status) => {
@@ -46,10 +46,10 @@ module.exports = function (covServices) {
       const body = bodyParser(req, rsp)
       if(!body) return
       if(!body.groupName){
-        rsp.status(400).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
+        rsp.status(422).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
         return
       } 
-      covServices.editGroup(body.groupName, body.newName, body.newDesc, (err, succ, status) => {
+      covServices.editGroup(req.params.groupName, body.newName, body.newDesc, (err, succ, status) => {
           if(err == null) rsp.status(200).send(`Group successfully edited to \n ${JSON.stringify(succ, null, "\t")}`)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
         })
@@ -67,10 +67,10 @@ module.exports = function (covServices) {
       const body = bodyParser(req, rsp)
       if(!body) return
       if(!body.groupName) {
-          rsp.status(400).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
+          rsp.status(422).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
           return
       }
-      covServices.showGroup(body.groupName, (err, succ, status) => {
+      covServices.showGroup(req.params.groupName, (err, succ, status) => {
           if(err == null) rsp.status(200).json(succ)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
       })
@@ -80,10 +80,10 @@ module.exports = function (covServices) {
       const body = bodyParser(req, rsp)
       if(!body) return
       if(!body.groupName || !body.gameID){
-        rsp.status(400).send(`Cannot reach groupName or gameID, please make sure body syntax is according to documentation.`)
+        rsp.status(422).send(`Cannot reach groupName or gameID, please make sure body syntax is according to documentation.`)
         return
       }
-      covServices.addToGroup(body.gameID, body.groupName, (err, game, status) => {
+      covServices.addToGroup(req.params.gameID, body.groupName, (err, game, status) => {
           if(err == null) rsp.status(200).send(`Game ${game.name} successfully added to group ${body.groupName}`)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
       })
@@ -93,10 +93,10 @@ module.exports = function (covServices) {
       const body = bodyParser(req, rsp)
       if(!body) return
       if(!body.groupName || !body.gameID){
-         rsp.status(400).send(`Cannot reach groupName or gameID, please make sure body syntax is according to documentation.`)
+         rsp.status(422).send(`Cannot reach groupName or gameID, please make sure body syntax is according to documentation.`)
          return
       }
-      covServices.removeFromGroup(body.gameID, body.groupName, (err, game, status) => {
+      covServices.removeFromGroup(req.params.gameID, body.groupName, (err, game, status) => {
           if(err == null) rsp.status(200).send(`Game ${game.name} successfully removed from group ${body.group}`)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
     })
@@ -105,11 +105,11 @@ module.exports = function (covServices) {
   function getGamesBetween(req, rsp){
       const body = bodyParser(req, rsp)
       if(!body) return
-      if(!body.groupName){
-        rsp.status(400).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
+      if(!req.params.groupName){
+        rsp.status(422).send(`Cannot reach groupName, please make sure body syntax is according to documentation.`)
         return
       }
-      covServices.getGamesBetween(body.groupName, body.max, body.min, (err, succ, status) => {
+      covServices.getGamesBetween(req.params.groupName, body.max, body.min, (err, succ, status) => {
           if(err == null) rsp.status(200).json(succ)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
       })

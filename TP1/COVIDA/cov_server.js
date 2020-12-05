@@ -14,19 +14,18 @@ app.use(bodyparser.text())
 
 app.get('/covida/games/search/', covApi.searchGames)
 app.post('/covida/groups/create', covApi.createGroup)
-app.put('/covida/groups/edit', covApi.editGroup)
+app.put('/covida/groups/edit/:groupName', covApi.editGroup)
 app.get('/covida/groups/list', covApi.listGroups)
-app.get('/covida/groups/show', covApi.showGroup)
-app.post('/covida/groups/add', covApi.addToGroup)
-app.delete('/covida/groups/remove', covApi.removeFromGroup)
-app.get('/covida/groups/sort', covApi.getGamesBetween)
+app.get('/covida/groups/show/:groupName', covApi.showGroup)
+app.post('/covida/groups/add/:groupName', covApi.addToGroup)
+app.delete('/covida/groups/remove/:groupName', covApi.removeFromGroup)
+app.get('/covida/groups/sort/:groupName', covApi.getGamesBetween)
 
 app.listen(PORT, () => {
     console.log("server is running...")
   })
 
 function checkAPI(req,rsp){
-  console.log(req.path);
   rsp.status(200).json({
     "name": "COVIDA",
     "version": "1.0.0",

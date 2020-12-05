@@ -61,5 +61,10 @@
 		"name": "gr1",
 		"description": "",
 		"games": []
+	},
+	{
+		"name": "Group 2",
+		"description": "Not so generic description",
+		"games": []
 	}
 ]
