@@ -57,8 +57,9 @@ function getGame(id, cb){
             game += d;
         }) 
         res.on('close', () =>{
-            if(res.statusCode == 200) cb(null, JSON.parse(game))
-            else cb(new Error(`Cannot find game ${id}, please make sure the ID is valid`), null, res.statusCode) 
+            if(res.statusCode == 200 && game.length > 2) cb(null, JSON.parse(game))
+            else if(res.statusCode != 200) cb(new Error(`Error accessing IGDB API`), null, res.statusCode)
+            else cb(new Error(`Cannot find game ${id}, please make sure the ID is valid`), null, 404)
         })     
     })
     req.on('error', error =>{

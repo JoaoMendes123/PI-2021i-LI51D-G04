@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs')
-const GROUPS_PATH = 'TP1/groups.json'
+const GROUPS_PATH = 'groups.json'
     /**
      * 
      * @param {Name of the group being created} group_name 
@@ -85,6 +85,7 @@ const GROUPS_PATH = 'TP1/groups.json'
             if(err) return cb(new Error(`Cant read  ${err}`),null,500)
             if(buffer.length == 0) return cb(new Error(`There are no groups to be edited, create one first`),null,404)
             var groups = JSON.parse(buffer)
+            if(groups.find(g => g.name == name_update)) return cb(new Error(`Can't update group name to one that already exists`),null,409)
             let targetGroup = groups.findIndex(group => group.name === group_name)
             if(targetGroup != -1){
                 groups[targetGroup].name = name_update? name_update : groups[targetGroup].name
@@ -129,7 +130,9 @@ const GROUPS_PATH = 'TP1/groups.json'
      * @param {lowest rating possible, passed to cb} low 
      * @param {callback function, returns games in interval} cb 
      */
-    function getGamesBetween(group_name,high,low,cb){
+    function getGamesBetween(group_name,high=100,low=0,cb){
+        high = high == ""? 100 : high
+        low = low == ""? 0 : low
         fs.readFile(GROUPS_PATH,(err,buffer) => {
             if(err) return cb(new Error(`Error reading: ${err}`),null,500)
             var groups = JSON.parse(buffer)
@@ -155,11 +158,11 @@ const GROUPS_PATH = 'TP1/groups.json'
      }
 
 
-function Group(group_name, group_description, games) {
-    this.name = group_name,
-    this.description = group_description,
-    this.games = games  
-}
+    function Group(group_name, group_description = "", games) {
+      this.name = group_name,
+      this.description = group_description,
+      this.games = games
+    }
 
 
 /**

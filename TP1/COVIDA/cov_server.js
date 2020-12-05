@@ -9,11 +9,17 @@ const covApi = require('./cov_web_api')(covServices)
 const PORT = 8000
 const app = express()
 app.use(express.json())
-app.use(bodyparser.text())
+app.use(bodyparser.json())
+
+app.use(function(err, req, rsp, next) {
+  if(err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    rsp.status(400).send("Error parsing body, body is not a valid JSON object.")
+  }else next()
+})
 
 app.get('/covida',checkAPI)
 app.get('/covida/games/search', covApi.searchGames)
-app.post('/covida/groups/create', covApi.createGroup)
+app.post('/covida/groups/create/:groupName', covApi.createGroup)
 app.put('/covida/groups/edit/:groupName', covApi.editGroup)
 app.get('/covida/groups/list', covApi.listGroups)
 app.get('/covida/groups/show/:groupName', covApi.showGroup)
