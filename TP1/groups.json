@@ -1,22 +1,17 @@
 [
 	{
-		"name": "11",
-		"description": "11",
+		"name": "group3",
+		"description": "",
 		"games": [
 			{
-				"id": 1942,
-				"name": "The Witcher 3: Wild Hunt",
-				"total_rating": 93.67216655864405
+				"id": 222,
+				"name": "Phantasmagoria: A Puzzle of Flesh",
+				"total_rating": 86.84180103858729
 			},
 			{
-				"id": 1,
-				"name": "Thief II: The Metal Age",
-				"total_rating": 89.1590627164617
-			},
-			{
-				"id": 1000,
-				"name": "Oddworld: Abe's Exoddus",
-				"total_rating": 82.59174716425746
+				"id": 2,
+				"name": "Thief: The Dark Project",
+				"total_rating": 78.3080223324581
 			},
 			{
 				"id": 4444,
@@ -24,47 +19,49 @@
 				"total_rating": 74.9577789549123
 			},
 			{
-				"id": 555,
-				"name": "Transformers: War for Cybertron",
-				"total_rating": 71.26547279707515
-			},
-			{
-				"id": 666,
-				"name": "Delta Force",
-				"total_rating": 67.5601255266934
-			},
-			{
-				"id": 2323,
-				"name": "Pokémon Mystery Dungeon: Explorers of Sky",
-				"total_rating": 64.98579316392875
-			},
-			{
 				"id": 100,
 				"name": "Need for Speed: ProStreet",
 				"total_rating": 64.15454275834695
 			},
 			{
-				"id": 66634,
-				"name": "Genji: Time Suspense Adventure"
-			},
-			{
 				"id": 9999,
 				"name": "A-Train The 21st Century"
-			},
-			{
-				"id": 41234,
-				"name": "Otocky"
 			}
 		]
 	},
 	{
-		"name": "gr1",
+		"name": "group 4",
+		"description": "Not so generic description",
+		"games": []
+	},
+	{
+		"name": "group2",
 		"description": "",
 		"games": []
 	},
 	{
-		"name": "Group 2",
-		"description": "Not so generic description",
+		"name": " so generic description",
+		"description": " so generic description",
+		"games": []
+	},
+	{
+		"name": "group 4+p+s+e",
+		"description": "Generic description",
+		"games": []
+	},
+	{
+		"name": "group+4+p+s+e",
+		"description": "Generic description",
+		"games": []
+	},
+	{
+		"name": "group 4 s e 2 dr",
+		"description": "Generic description",
+		"games": []
+	},
+	{
+		"name": " ",
+		"description": "Generic description",
 		"games": []
 	}
 ]
