@@ -9,10 +9,10 @@ const covApi = require('./cov_web_api')(covServices)
 const PORT = 8000
 const app = express()
 app.use(express.json())
-app.get('/',checkAPI)
 app.use(bodyparser.text())
 
-app.get('/covida/games/search/', covApi.searchGames)
+app.get('/covida',checkAPI)
+app.get('/covida/games/search', covApi.searchGames)
 app.post('/covida/groups/create', covApi.createGroup)
 app.put('/covida/groups/edit', covApi.editGroup)
 app.get('/covida/groups/list', covApi.listGroups)
@@ -26,7 +26,6 @@ app.listen(PORT, () => {
   })
 
 function checkAPI(req,rsp){
-  console.log(req.path);
   rsp.status(200).json({
     "name": "COVIDA",
     "version": "1.0.0",

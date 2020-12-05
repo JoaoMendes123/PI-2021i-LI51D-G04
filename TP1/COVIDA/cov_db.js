@@ -1,6 +1,6 @@
 'use strict'
 const fs = require('fs')
-const GROUPS_PATH = 'groups.json'
+const GROUPS_PATH = 'TP1/groups.json'
     /**
      * 
      * @param {Name of the group being created} group_name 
