@@ -44,7 +44,7 @@ const GROUPS_PATH = 'groups.json'
                         })
                     }
                 })
-            }else return cb(new Error(`Can't find group with name:${group_name}`),406)
+            }else return cb(new Error(`Can't find group with name:${group_name}`),404)
         })
     }
     /**
@@ -71,7 +71,7 @@ const GROUPS_PATH = 'groups.json'
             var groups = JSON.parse(buffer)
             var targetGroup = groups.find(group => group.name === group_name)
             if(targetGroup) return cb(null,targetGroup)
-            else cb(new Error(`Can't find group with name ${group_name}`),null,406)
+            else cb(new Error(`Can't find group with name ${group_name}`),null,404)
         })
     }
     /**
@@ -96,7 +96,7 @@ const GROUPS_PATH = 'groups.json'
                     let res = new Group(groups[targetGroup].name,groups[targetGroup].description)
                     cb(null,res)
                 })
-            }else return cb(new Error(`There is no group with name ${group_name}`),null,406)
+            }else return cb(new Error(`There is no group with name ${group_name}`),null,404)
         })
     }
     /**
@@ -122,7 +122,7 @@ const GROUPS_PATH = 'groups.json'
                         })
                     }
                 })  
-            }else return cb(new Error(`There is no group with name ${group_name}`),406)
+            }else return cb(new Error(`There is no group with name ${group_name}`),404)
         })
     }
     /**
