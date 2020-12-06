@@ -3,39 +3,21 @@ const serverBase = 'http://localhost:8000/covida/'
 const Joi = frisby.Joi
 
 var test_group = {
-    "name": "testGroup",
-    "description":"A generic one",
-    "games":[
-        {
-            "id": 1,
-            "name": "game1",
-            "total_rating": 86.84180103858729
-        },
-        {
-            "id": 2,
-            "name": "game2",
-            "total_rating": 78.3080223324581
-        },
-        {
-            "id": 3,
-            "name": "game3",
-            "total_rating": 74.9577789549123
-        },
-        {
-            "id": 4,
-            "name": "game4",
-            "total_rating": 64.15454275834695
-        },
-        {
-            "id": 5,
-            "name": "game5"
-        }
-    ]
-}
-var testGame={
-    "id": Joi.number(),
     "name": Joi.string(),
-    "total_rating": Joi.number()
+    "description":Joi.string(),
+    "games":Joi.array().min(0).required()
+}
+var test_group_insertion={
+    "name": "testGroup",
+    "description": "test Description",
+    "games":[]
+}
+var answer_schema ={
+    "status": {
+        "message": Joi.string(),
+        "result": Joi.any().required()
+    },
+    "uri": Joi.string()
 }
 
 /**
@@ -65,7 +47,7 @@ describe(`Search for a game in IGDB`,() =>{
         return frisby.get(`${serverBase}games/search?name=Witcher+3`)
             .expect(`status`,200)
             .expect(`header`,`Content-Type`,`application/json; charset=utf-8` )
-            .expect(`jsonTypes`,Joi.array().items(testGame))
+            .expect(`jsonTypes`,answer_schema)
     })
 })
 /**
@@ -73,41 +55,34 @@ describe(`Search for a game in IGDB`,() =>{
  */
 describe(`createGroup() in groups.Json`,() =>{
     test('should create a group successfully',()=>{
-        return frisby.post(`${serverBase}groups/create/${test_group.name}`,{
-            'description' : test_group.description
+        return frisby.post(`${serverBase}groups/create/${test_group_insertion.name}`,{
+            'description' : test_group_insertion.description
         })
         .expect(`status`,201)
         .expect(`header`,`Content-Type`,`application/json; charset=utf-8`)
-        .expect(`jsonTypes`,{
-            'status':  `group ${test_group.name} created successfully.`,
-            'uri':  `/covida/groups/create/${test_group.name}`
-        })
+        .expect(`jsonTypes`,answer_schema)
     })
-    test(`should not create a group successfully because on already existe with ${test_group.name}`,()=>{
-        return frisby.post(`${serverBase}groups/create/${test_group.name}`,{
+    test(`should not create a group successfully because on already existe with ${test_group_insertion.name}`,()=>{
+        return frisby.post(`${serverBase}groups/create/${test_group_insertion.name}`,{
             'desc' : 'testDesc'
         })
         .expect(`status`,409)
         .expect(`header`,`Content-Type`,`application/json; charset=utf-8`)
         .expect(`jsonTypes`,{
-            'status':  `group ${test_group.name} created successfully.`,
-            'uri':  `/covida/groups/create/${test_group.name}`
+            "error": `Can't create new group with ${test_group_insertion.name} because one already exists `,
+            "uri": `/covida/groups/create/${test_group_insertion.name}`
         })
     })
 })
 
 describe(`editGroup() in groups.Json`,() =>{
     test('Only desc given, should complete anyways',()=>{
-        console.log(test_group.name)
-        return frisby.put(`${serverBase}groups/edit/${test_group.name}`,{
+        return frisby.put(`${serverBase}groups/edit/${test_group_insertion.name}`,{
             "newDesc" : "desc"
             })
         .expect(`status`,200)
         .expect(`header`,`Content-Type`,`application/json; charset=utf-8`)
-        .expect(`jsonTypes`,{
-            "name" : "${test_group.name}",
-            "description" : "edited desc"
-            })
+        .expect(`jsonTypes`,answer_schema)
     })
     test(`should not edit group successfully because it doesnt exist ${test_group.name}Error`,()=>{
         return frisby.put(`${serverBase}groups/edit/${test_group.name}Error`,{

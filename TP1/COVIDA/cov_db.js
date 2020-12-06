@@ -13,10 +13,11 @@ const GROUPS_PATH = 'groups.json'
             let groups = buffer.length > 0 ? JSON.parse(buffer) : []
             if(groups.some(group => group.name === group_name))
                 return cb(new Error(`Can't create new group with ${group_name} because one already exists `),null,409)
-            groups.push(new Group(group_name,group_description,[]))
+            let res = new Group(group_name,group_description,[])
+            groups.push(res)
             fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
                 if(err) {return cb(new Error(`Error Writing: ${err}`),null,500)}
-                cb(null)
+                cb(null,res)
             })
         })
     }

@@ -26,7 +26,7 @@ module.exports = function (covServices) {
   function createGroup(req, rsp){
       const groupName = req.params.groupName.split("+").join(" ")
       covServices.createGroup(groupName, req.body.desc, (err, succ, status) => {
-          if(err == null) sendSuccess(req,rsp,new Answer(`Group sucessfully Created.`,succ),200)
+          if(err == null) sendSuccess(req,rsp,new Answer(`Group sucessfully Created.`,succ),201)
           else rsp.status(status).json(new Error(err.message, req.originalUrl))
       })
   }
