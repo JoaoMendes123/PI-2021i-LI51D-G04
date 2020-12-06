@@ -143,7 +143,7 @@ const GROUPS_PATH = 'groups.json'
                     if(group.name == group_name && group.games.length != 0){
                         var res = group.games.filter(game => game.total_rating >= low && game.total_rating <= high)
                         if(res.length >= 1) return cb(null,res)
-                        else return cb(new Error(`No games fit in given rating interval`),null,404)
+                        else return cb(new Error(`No games fit in given rating interval`),null,406)
                     }else if(group.name == group_name && group.games.length == 0) return cb(new Error(`Group ${group.name} doesn't have any games in it`),null,404)
                 })
             }else return cb(new Error(`There is no group with name ${group_name}`),null,500)
