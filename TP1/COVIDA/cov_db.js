@@ -92,7 +92,8 @@ const GROUPS_PATH = 'groups.json'
                 groups[targetGroup].description = description_update?  description_update : groups[targetGroup].description 
                 fs.writeFile(GROUPS_PATH, JSON.stringify(groups,null,`\t`), (err) => {
                     if(err) return cb(new Error(`Error Writing: ${err}`),null,500)
-                    cb(null,groups[targetGroup])
+                    let res = new Group(groups[targetGroup].name,groups[targetGroup].description)
+                    cb(null,res)
                 })
             }else return cb(new Error(`There is no group with name ${group_name}`),null,406)
         })
@@ -113,10 +114,10 @@ const GROUPS_PATH = 'groups.json'
                     if(group.name == group_name){
                         let target_index = group.games.findIndex(g => g.name == game.name)
                         if(target_index == -1) return cb(new Error(`Couldn't find game ${game.name} in group ${group.name}`),409)
-                        group.games.splice(target_index, 1)
+                        let game_removed = group.games.splice(target_index, 1)
                         fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
                             if(err) {return cb(new Error(`Error Writing: ${err}`),500)}
-                            cb(null)
+                            cb(null,game_removed)
                         })
                     }
                 })  
