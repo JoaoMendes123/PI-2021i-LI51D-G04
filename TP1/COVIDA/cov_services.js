@@ -49,7 +49,7 @@ module.exports = function(covDB) {
 
     function addToGroup(id, group, callback){
         igdb.getGame(id, (err, game, status) => {
-            if(status) callback(err, null, status)
+            if(status) return callback(err, null, status)
             covDB.addToGroup(group, game[0], (err, status) => {
                 callback(err, game[0], status)
             })
@@ -58,7 +58,7 @@ module.exports = function(covDB) {
 
     function removeFromGroup(game, group, callback){
         igdb.getGame(game, (err, game, status) => {
-            if(status) callback(err, null, status)
+            if(status) return callback(err, null, status)
             covDB.removeFromGroup(group, game[0], (err, status) => {
                 callback(err, game[0], status)
             })

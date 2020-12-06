@@ -74,7 +74,7 @@ module.exports = function (covServices) {
   }
 
   function getGamesBetween(req, rsp){
-      if(req.body.min > req.body.max) return rsp.status(406).send(`${req.min} to ${req.max} is not a valid interval`)
+      if(req.body.min > req.body.max) return rsp.status(406).send(`${req.body.min} to ${req.body.max} is not a valid interval`)
       const groupName = req.params.groupName.split("+").join(" ")
       covServices.getGamesBetween(groupName, req.body.max, req.body.min, (err, succ, status) => {
           if(err == null) sendSuccess(req,rsp,new Answer('Games that fit interval:',succ),200)

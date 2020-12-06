@@ -138,6 +138,7 @@ const GROUPS_PATH = 'groups.json'
         fs.readFile(GROUPS_PATH,(err,buffer) => {
             if(err) return cb(new Error(`Error reading: ${err}`),null,500)
             var groups = JSON.parse(buffer)
+            if(buffer.length == 0) return cb(new Error(`There are no groups to display, create one first`),404)
             if(groups.find(group => group.name == group_name)){
                 groups.forEach(group => {
                     if(group.name == group_name && group.games.length != 0){

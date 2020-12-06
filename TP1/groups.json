@@ -1,0 +1,33 @@
+[
+	{
+		"name": "Group 1",
+		"description": "Generic description",
+		"games": [
+			{
+				"id": 1,
+				"name": "Thief II: The Metal Age",
+				"total_rating": 89.1590627164617
+			},
+			{
+				"id": 5,
+				"name": "Baldur's Gate",
+				"total_rating": 87.70667029132699
+			},
+			{
+				"id": 3,
+				"name": "Thief: Deadly Shadows",
+				"total_rating": 83.08639686658546
+			},
+			{
+				"id": 2,
+				"name": "Thief: The Dark Project",
+				"total_rating": 78.3080223324581
+			},
+			{
+				"id": 4,
+				"name": "Thief",
+				"total_rating": 66.82113340436895
+			}
+		]
+	}
+]
