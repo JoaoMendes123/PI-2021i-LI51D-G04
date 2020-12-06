@@ -1,7 +1,7 @@
 {
-  "name": "tp1",
-  "version": "1.0.0",
-  "description": "",
+  "name": "covida",
+  "version": "1.0.1",
+  "description": "Manage groups of games",
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.19.0",

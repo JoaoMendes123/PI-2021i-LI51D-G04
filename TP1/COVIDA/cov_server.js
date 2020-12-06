@@ -25,7 +25,7 @@ app.get('/covida/groups/list', covApi.listGroups)
 app.get('/covida/groups/show/:groupName', covApi.showGroup)
 app.post('/covida/groups/add/:groupName', covApi.addToGroup)
 app.delete('/covida/groups/remove/:groupName', covApi.removeFromGroup)
-app.get('/covida/groups/sort/:groupName', covApi.getGamesBetween)
+app.get('/covida/groups/:groupName', covApi.getGamesBetween)
 
 app.listen(PORT, () => {
     console.log("server is running...")

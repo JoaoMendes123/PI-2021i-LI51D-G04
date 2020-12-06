@@ -110,7 +110,7 @@ const GROUPS_PATH = 'groups.json'
             if(err) return cb(new Error(`Cant read  ${err}`), 500)
             var groups = JSON.parse(buffer)
             if(buffer.length == 0) return cb(new Error(`There are no groups to remove, create one first`),404)
-            if(groups.find(group => group.name = group_name)){
+            if(groups.find(group => group.name == group_name)){
                 groups.forEach(group => {
                     if(group.name == group_name){
                         let target_index = group.games.findIndex(g => g.name == game.name)

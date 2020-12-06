@@ -1,12 +1,12 @@
 [
 	{
-		"name": "Group 1",
-		"description": "Generic description",
+		"name": "anotherTestName",
+		"description": "desc",
 		"games": [
 			{
-				"id": 1,
-				"name": "Thief II: The Metal Age",
-				"total_rating": 89.1590627164617
+				"id": 6,
+				"name": "Baldur's Gate II: Shadows of Amn",
+				"total_rating": 89.9583206649952
 			},
 			{
 				"id": 5,
@@ -17,6 +17,16 @@
 				"id": 3,
 				"name": "Thief: Deadly Shadows",
 				"total_rating": 83.08639686658546
+			},
+			{
+				"id": 8,
+				"name": "Jagged Alliance: Deadly Games",
+				"total_rating": 82.95492050895909
+			},
+			{
+				"id": 7,
+				"name": "Jagged Alliance",
+				"total_rating": 79.0614864602117
 			},
 			{
 				"id": 2,
