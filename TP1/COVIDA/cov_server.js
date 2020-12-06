@@ -13,7 +13,7 @@ app.use(bodyparser.json())
 
 app.use(function(err, req, rsp, next) {
   if(err instanceof SyntaxError && err.status === 400 && "body" in err) {
-    rsp.status(400).send("Error parsing body, body is not a valid JSON object.")
+    rsp.status(400).json("Error parsing body, body is not a valid JSON object.")
   }else next()
 })
 
