@@ -57,7 +57,7 @@ module.exports = function (covServices) {
 
   function addToGroup(req, rsp){
       if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-      if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`), req.originalUrl)
+      if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`, req.originalUrl))
       const groupName = req.params.groupName.split("+").join(" ")
       covServices.addToGroup(req.body.gameID, groupName, (err, game, status) => {
           if(err == null) sendSuccess(req,rsp,new Answer(`Game ${game.name} successfully added to group ${groupName}`, game),200)
@@ -67,7 +67,7 @@ module.exports = function (covServices) {
 
   function removeFromGroup(req, rsp){
       if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-      if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`),req.originalUrl)
+      if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
       const groupName = req.params.groupName.split("+").join(" ")
       covServices.removeFromGroup(req.body.gameID, groupName, (err, game, status) => {
           if(err == null) sendSuccess(req,rsp,new Answer("Game successfully removed", game),200)
