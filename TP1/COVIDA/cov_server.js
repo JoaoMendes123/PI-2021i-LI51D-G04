@@ -19,13 +19,13 @@ app.use(function(err, req, rsp, next) {
 
 app.get('/covida',checkAPI)
 app.get('/covida/games/search', covApi.searchGames)
-app.post('/covida/groups/create/:groupName', covApi.createGroup)
-app.put('/covida/groups/edit/:groupName', covApi.editGroup)
+app.post('/covida/groups/create', covApi.createGroup)//TO DO body request name
+app.put('/covida/groups/edit/:groupId', covApi.editGroup)
 app.get('/covida/groups/list', covApi.listGroups)
-app.get('/covida/groups/show/:groupName', covApi.showGroup)
-app.post('/covida/groups/add/:groupName', covApi.addToGroup)
-app.delete('/covida/groups/remove/:groupName', covApi.removeFromGroup)
-app.get('/covida/groups/:groupName', covApi.getGamesBetween)
+app.get('/covida/groups/show/:groupId', covApi.showGroup)
+app.post('/covida/groups/add/:groupId', covApi.addToGroup)
+app.delete('/covida/groups/remove/:groupId', covApi.removeFromGroup)
+app.get('/covida/groups/:groupId', covApi.getGamesBetween)
 
 app.listen(PORT, () => {
     console.log("server is running...")

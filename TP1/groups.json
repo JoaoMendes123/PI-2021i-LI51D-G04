@@ -1,42 +1,23 @@
 [
 	{
-		"name": "anotherTestName",
-		"description": "desc",
+		"id": 0,
+		"name": "CDPR Games",
+		"description": "Games by CDPR",
 		"games": [
 			{
-				"id": 6,
-				"name": "Baldur's Gate II: Shadows of Amn",
-				"total_rating": 89.9583206649952
+				"id": 80,
+				"name": "The Witcher",
+				"total_rating": 85.51692368515435
 			},
 			{
-				"id": 5,
-				"name": "Baldur's Gate",
-				"total_rating": 87.70667029132699
+				"id": 19474,
+				"name": "Gwent: The Witcher Card Game",
+				"total_rating": 82.3334560088026
 			},
 			{
-				"id": 3,
-				"name": "Thief: Deadly Shadows",
-				"total_rating": 83.08639686658546
-			},
-			{
-				"id": 8,
-				"name": "Jagged Alliance: Deadly Games",
-				"total_rating": 82.95492050895909
-			},
-			{
-				"id": 7,
-				"name": "Jagged Alliance",
-				"total_rating": 79.0614864602117
-			},
-			{
-				"id": 2,
-				"name": "Thief: The Dark Project",
-				"total_rating": 78.3080223324581
-			},
-			{
-				"id": 4,
-				"name": "Thief",
-				"total_rating": 66.82113340436895
+				"id": 1877,
+				"name": "Cyberpunk 2077",
+				"total_rating": 76.9410988658844
 			}
 		]
 	}
