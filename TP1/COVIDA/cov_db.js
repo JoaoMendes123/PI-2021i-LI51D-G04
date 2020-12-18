@@ -1,190 +1,237 @@
-'use strict'
-const fs = require('fs')
-const resources = require('./resources.js')
 const GROUPS_PATH = 'groups.json'
-    /**
-     * 
-     * @param {Id of the group being created} group_id 
-     * @param {Description of the group being created} group_description 
-     */
-    function createGroup(group_name,group_description){
-        return new Promise((promise,reject) =>{
-            fs.readFile(GROUPS_PATH, (err, buffer) => {
-                if(err)return reject(new resources.dbError(`Cant read  ${err}`,500))
-                let groups = buffer.length > 0 ? JSON.parse(buffer) : []
-                let nextId = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
-                let res = new resources.dbGroup(nextId,group_name,group_description,[])
-                groups.push(res)
-                fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                    if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
-                    else promise(res)
+const ES_URL =  `http://localhost:9200`
+const { group } = require('console')
+const fetch = require('node-fetch')
+const { dbError,dbGroup,dbGame } = require('./resources.js')
+/**
+ * TODO:
+ *  Handle Erros in available functions
+ *  might be able to get rid of group_index in editGroup showGroup getGamesBetween addToGroup removeFromGroup
+ */
+async function createGroup(group_name, group_description){
+    var groups = await fetchGroups()
+    let _id = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
+    let new_group = new dbGroup(_id,group_name,group_description,[])
+    return fetch(ES_URL+`/groups/_doc/${_id}`,{
+        method: 'PUT',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body:JSON.stringify({
+            "group":  new_group
+        })
+    })
+    .then(res => res.json())
+    .then(res => {if(res.result == 'created')return new_group})
+
+}
+async function deleteGroup(group_id){
+    var groups = await fetchGroups()
+    if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
+    let group_deleted = groups.find(group => group.id == group_id)
+    return fetch(ES_URL+`/groups/_doc/${group_id}`,{
+        method: 'DELETE',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.result == 'not_found') throw new dbError(`There is no group with id: ${group_id}`,404)
+        if(res.result == 'deleted') return group_deleted
+    })
+
+}
+/**
+ * updates given group with a new game and returns group updated
+ * @param {group to change} group_id 
+ * @param {game to add} game 
+ */
+async function addToGroup(group_id,game){
+    var groups = await fetchGroups()
+    if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
+    let group_index = groups.findIndex(group => group.id == group_id)
+    if(group_index !=-1){
+        if(groups[group_index].games.find(g => g.id == game.id)) throw new dbError(`Game already in group `,404)
+    }else throw new dbError(`Group given not found `,404)
+    return fetch(ES_URL+`/groups/_update/${group_id}`,{
+        method:'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body:JSON.stringify({
+            "script": {
+                "source": "ctx._source.group.games.add(params.tag)",
+                "lang": "painless",
+                "params": {
+                  "tag": game
+                }
+              }
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+        if(res.result == 'updated'){
+            groups[group_index].games.push(game)
+            return groups[group_index]
+        }  
+    })
+    
+}
+/**
+ * removes specific game from a specific group and returns name of group affected
+ * @param {group to change} group_id 
+ * @param {agme to remove} game_id 
+ */
+async function removeFromGroup(group_id, game_id){
+    var groups = await fetchGroups()
+    if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
+    let group_index = groups.findIndex(group => group.id == group_id)
+    if(group_index !=-1){
+        removedGame = groups[group_index].games.findIndex(g => g.id == game_id)
+        if(removedGame != -1){
+            return fetch(ES_URL+`/groups/_update/${group_id}`,{
+                method:'POST',
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    "script": {
+                        "source": "ctx._source.group.games.remove(params.game)",
+                        "lang": "painless",
+                        "params": {
+                            "game": removedGame
+                          }
+                      }
                 })
             })
-        })   
-    }
-    /**
-     * 
-     * @param {Id of the group being affected} group_id
-     * @param {JSON-Object to add to group} game 
-     */
-    function addToGroup(group_id,game){
-        return new Promise((promise, reject) => {
-            fs.readFile(GROUPS_PATH, 'utf8', (err, buffer) => {
-                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups, create one first`,404))
-                var groups = JSON.parse(buffer)
-                if(!game.name) return reject(new resources.dbError(`No such game found, make sure the ID is correct`,406))//dont know if i need this here
-                if(groups.find(group => group.id == group_id)){
-                    groups.forEach(group => {  
-                        if(group.id == group_id){
-                            if(group.games.find(g => g.id == game.id)) return reject(new resources.dbError(`Can't add ${game.name} to group ${group.name} because it's already present`,409))
-                            group = sorted_game_insertion(group, game)
-                            fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                                if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
-                                else promise(group)
-                            })
-                        }
-                    })
-                }else return reject(new resources.dbError(`Can't find group with id:${group_id}`,404))
+            .then(res => res.json())
+            .then(res => {
+                if(res.result == 'deleted') return groups[group_index].name
+            })
+            
+        }else  throw new dbError('Game not in group',404)
+    }else throw new dbError('Group given not found ',404)
+}
+/**
+ * 
+ * @param {group to be edited} group_id 
+ * @param {update to name field} name_update can be null
+ * @param {uptade to description field} description_update can be null
+ */
+async function editGroup(group_id, name_update, description_update){
+    var groups = await fetchGroups()
+    if(name_update)
+    if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
+    let group_index =  groups.findIndex(group => group.id == group_id)
+    if(group_index != -1){
+        groups[group_index].name = name_update? name_update:groups[group_index].name
+        groups[group_index].description = description_update?  description_update : groups[group_index].description
+        return fetch(ES_URL+`/groups/_update/${group_id}`,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({
+                "doc": {
+                    "group" : groups[group_index]
+                  }
             })
         })
-    }
-    /**
-     * Returns groups available to the callback function
-     */
-    function listGroups(){
-        return new Promise((promise,reject) => {
-            fs.readFile(GROUPS_PATH, (err,buffer) => {
-                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be listed, create one first`,404))
-                var groups = JSON.parse(buffer)
-                promise(groups)
-            })
-        })
-    }
-    /**
-     * 
-     * @param {Id of the group to be passed to callback function} group_id 
-     */
-    function showGroup(group_id){
-        return new Promise((promise,reject)=>{
-            fs.readFile(GROUPS_PATH, (err,buffer) => {
-                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be shown, create one first`,404))
-                var groups = JSON.parse(buffer)
-                var targetGroup = groups.find(group => group.id == group_id)
-                if(targetGroup) return promise(targetGroup)
-                else return reject(new resources.dbError(`Can't find group with name id:${group_id}`,404))
-            })
-        }) 
-    }
-    /**
-     * 
-     * @param {Id of the group to be edited} group_id 
-     * @param {updated name, if undefined doens't update group's name} name_update 
-     * @param {updated description, if undefined doesn't update group's name} description_update 
-     */
-    function editGroup(group_id, name_update, description_update){
-        return new Promise((promise,reject) =>{
-            fs.readFile(GROUPS_PATH, (err, buffer) => {
-                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be edited, create one first`,404))
-                var groups = JSON.parse(buffer)
-                let targetGroup = groups.findIndex(group => group.id == group_id)
-                if(targetGroup != -1){
-                    groups[targetGroup].name = name_update? name_update : groups[targetGroup].name
-                    groups[targetGroup].description = description_update?  description_update : groups[targetGroup].description 
-                    fs.writeFile(GROUPS_PATH, JSON.stringify(groups,null,`\t`), (err) => {
-                        if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
-                        //Group with no games to display to user
-                        else return promise(new resources.dbGroup(groups[targetGroup].id,groups[targetGroup].name,groups[targetGroup].description))
-                    })
-                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,404))
-            })
-        })
-    }
-    /**
-     * 
-     * @param {id of the group to be affected} group_id
-     * @param {JSON-Object to remove from group} game 
-     */
-    function removeFromGroup(group_id,game){
-        return new Promise((promise,reject) =>{
-            fs.readFile(GROUPS_PATH,(err,buffer)=>{
-                if(err) return reject(new resources.dbError(`Cant read  ${err}`, 500))
-                var groups = JSON.parse(buffer)
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to remove, create one first`,404))
-                if(groups.find(group => group.id == group_id)){
-                    groups.forEach(group => {
-                        if(group.id == group_id){
-                            let target_index = group.games.findIndex(g => g.id == game.id)
-                            if(target_index == -1)return reject(new resources.dbError(`Couldn't find game ${game.name} in group ${group.name}`,409))
-                            let game_removed = group.games.splice(target_index, 1)
-                            fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                                if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
-                                return promise(game_removed)
-                            })
-                        }
-                    })  
-                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,404))
-            })
-        }) 
-    }
-    /**
-     * @param {id of the group to display} group_id 
-     * @param {highest rating possible, passed to cb} high 
-     * @param {lowest rating possible, passed to cb} low 
-     */
-    function getGamesBetween(group_id,high=100,low=0){
-        high = high == ""? 100 : high
-        low = low == ""? 0 : low
-        return new Promise((promise,reject) =>{
-            fs.readFile(GROUPS_PATH,(err,buffer) => {
-                if(err) return reject(new resources.dbError(`Error reading: ${err}`,500))
-                var groups = JSON.parse(buffer)
-                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to display, create one first`,404))
-                if(low > high) return reject(new resources.Error(`${low} to ${high} is not a valid interval`, 406))                
-                if(groups.find(group => group.id == group_id)){
-                    groups.forEach(group => {
-                        if(group.id == group_id && group.games.length != 0){
-                            var res = group.games.filter(game => game.total_rating >= low && game.total_rating <= high)
-                            if(res.length >= 1) return promise(res)
-                            else return reject(new resources.dbError(`No games fit in given rating interval`,406))
-                        }else if(group.id == group_id && group.games.length == 0) return reject(new resources.dbError(`Group ${group.name} doesn't have any games in it`,404))
-                    })
-                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,500))
-            })
-        })    
-    }
-    module.exports = {
-         createGroup: createGroup,
-         addToGroup: addToGroup,
-         listGroups: listGroups,
-         showGroup: showGroup,
-         editGroup: editGroup,
-         removeFromGroup: removeFromGroup,
-         getGamesBetween: getGamesBetween
-     }
+        .then(res => res.json())
+        
+    }else throw new dbError("Group Not Found",404)
+}
+/**
+ * returns all groups
+ */
+async function listGroups(){
+    return await fetchGroups()
+}
+/**
+ * return specified group
+ * @param {group to be shown} group_id 
+ */
+async function showGroup(group_id){
+    let groups = await fetchGroups()
+    if(groups.length == 0) throw new dbError('No groups in DB',500)
+    group_index = groups.findIndex(group => group.id == group_id)
+    if(group_index != -1){
+        return groups[group_index]
+    }else throw new dbError('Group Not Found',404)
+
+}
+/**
+ * returns the group with given id to cov_services
+ * @param {group to be shown} group_id 
+ */
+async function getGamesBetween(group_id){
+    return await showGroup(group_id)
+}
+
+
+
+module.exports = {
+    createGroup: createGroup,
+    deleteGroup:deleteGroup,
+    addToGroup: addToGroup,
+    removeFromGroup: removeFromGroup,
+    listGroups: listGroups,
+    showGroup: showGroup,
+    editGroup: editGroup,
+    getGamesBetween: getGamesBetween
+}
 
 /**
- * Inserts game in a way to remain in a descending order by rating
- * @param {*} game 
- * @param {*} group 
- */
+* Inserts game in a way to remain in a descending order by rating
+* @param {*} game 
+* @param {*} group 
+*/
 function sorted_game_insertion(group,game){
-    if(group.games.length == 0){
-        group.games.push(game);
-    }else{
-        group.games.push(game);
-        for (let i = 1; i < group.games.length; i++) {
-            let current = group.games[i];
-            let j = i-1; 
-            while ((j > -1) && (current.total_rating > group.games[j].total_rating || !group.games[j].total_rating )) {
-                group.games[j+1] = group.games[j];
-                j--;
-            }
-            group.games[j+1] = current;
-        }
-    }
-    return group;
+if(group.games.length == 0){
+   group.games.push(game);
+}else{
+   group.games.push(game);
+   for (let i = 1; i < group.games.length; i++) {
+       let current = group.games[i];
+       let j = i-1; 
+       while ((j > -1) && (current.total_rating > group.games[j].total_rating || !group.games[j].total_rating )) {
+           group.games[j+1] = group.games[j];
+           j--;
+       }
+       group.games[j+1] = current;
+   }
 }
+return group;
+}
+
+function fetchGroups(){
+    return fetch(ES_URL+`/groups/_search`,{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "from" : 0, "size" : 100
+        })
+    })
+    .then(res => res.json())
+    .then(res => {
+        let a = res.hits.hits
+        let aux = []
+        for(var i = 0; i<a.length;i++){
+            var g = new dbGroup(a[i]._id,a[i]._source.group.name,a[i]._source.group.description,a[i]._source.group.games)
+            aux.push(g)
+        }
+        return aux
+    })
+}
+//createGroup('oi','desck212').then(res => console.log(res)).catch(err => console.log(JSON.stringify(err)))
+//deleteGroup(0).then(res =>console.log(res)).catch(err => console.log(err))
+//fetchGroups().then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))
+//addToGroup(2,new dbGame(6,'game_name')).then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))
+//removeFromGroup(3,1273).then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))
+//aux().then(res => console.log(res)).catch(err => console.log(err))
+//editGroup(1,'updatedName',"updated descriptio2n").then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))
+//listGroups().then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))
+//showGroup(2).then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))

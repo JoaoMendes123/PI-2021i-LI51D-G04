@@ -28,7 +28,7 @@ function searchGames(name) {
     })
 }
 
-function getGame(id){
+async function getGame(id){
     const body = `fields name, total_rating, id; where id = ${id};`
     return fetch('https://api.igdb.com/v4/games/', {
         method: 'POST',

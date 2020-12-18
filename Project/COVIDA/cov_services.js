@@ -1,6 +1,5 @@
 'use strict'
 const igdb = require('./igdb-data')
-const sampleDB = require('./sampleDB')
 module.exports = function(covDB) {
     if(!covDB) {
       throw "Invalid covDB object"
@@ -22,22 +21,16 @@ module.exports = function(covDB) {
     function searchGames(str){
         return new Promise((resolve, reject) => {
             igdb.searchGames(str)
-                .then(games => {
-                    resolve(games)
-                })
-                .catch(error => {
-                    reject(error)
-                })
+                .then(games => resolve(games))
+                .catch(error => reject(error))
         })
     }
     
     function createGroup(name, desc){
         return new Promise((resolve, reject) => {
-            covDB.createGroup(name, desc) //  covDB.createGroup(name, desc)
-                .then(res => {
-                    resolve(res)})
-                .catch(error => {
-                    reject(error)})
+            covDB.createGroup(name, desc)
+                .then(res => resolve(res))
+                .catch(error => reject(error))
         })
     }
     
@@ -51,17 +44,15 @@ module.exports = function(covDB) {
     
     function listGroups(){
         return new Promise((resolve, reject) => {
-            sampleDB.listGroups()
-                .then(res => {
-                    resolve(res)})
-                .catch(error => {
-                    reject(error)})
+            covDB.listGroups()
+                .then(res => resolve(res))
+                .catch(error => reject(error))
         })
     }
     
     function showGroup(groupID){
         return new Promise((resolve, reject) => {
-            sampleDB.showGroup(groupID) 
+            covDB.showGroup(groupID) 
                 .then(res => resolve(res))
                 .catch(error => reject(error))
         })
@@ -69,11 +60,9 @@ module.exports = function(covDB) {
 
     function deleteGroup(groupID){
         return new Promise((resolve, reject) => {
-            sampleDB.deleteGroup(groupID)
-                .then(res => {
-                    resolve(res)})
-                .catch(error => {
-                    reject(error)})
+            covDB.deleteGroup(groupID)
+                .then(res => resolve(res))
+                .catch(error => reject(error))
         })
     }
     
@@ -81,7 +70,7 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    sampleDB.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
+                    cov.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
                         .then((group) => {
                             resolve({
                                 group: group,
@@ -99,7 +88,7 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    sampleDB.removeFromGroup(groupID, game[0])
+                    covDB.removeFromGroup(groupID, game[0])
                         .then((g) => resolve(g))
                         .catch((err) => reject(err))
                     })

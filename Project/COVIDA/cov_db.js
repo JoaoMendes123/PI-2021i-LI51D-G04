@@ -6,7 +6,7 @@ const { dbError,dbGroup,dbGame } = require('./resources.js')
 /**
  * TODO:
  *  Handle Erros in available functions
- *  might be able to get rid of group_index in editGroup showGroup getGamesBetween addToGroup removeFromGroup
+ *  
  */
 async function createGroup(group_name, group_description){
     var groups = await fetchGroups()
@@ -24,8 +24,11 @@ async function createGroup(group_name, group_description){
     })
     .then(res => res.json())
     .then(res => {if(res.result == 'created')return new_group})
-
 }
+/**
+ * deletes group from BD and returns removed group
+ * @param {id of group to be deleted} group_id 
+ */
 async function deleteGroup(group_id){
     var groups = await fetchGroups()
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
@@ -181,29 +184,6 @@ module.exports = {
     showGroup: showGroup,
     editGroup: editGroup,
     getGamesBetween: getGamesBetween
-}
-
-/**
-* Inserts game in a way to remain in a descending order by rating
-* @param {*} game 
-* @param {*} group 
-*/
-function sorted_game_insertion(group,game){
-if(group.games.length == 0){
-   group.games.push(game);
-}else{
-   group.games.push(game);
-   for (let i = 1; i < group.games.length; i++) {
-       let current = group.games[i];
-       let j = i-1; 
-       while ((j > -1) && (current.total_rating > group.games[j].total_rating || !group.games[j].total_rating )) {
-           group.games[j+1] = group.games[j];
-           j--;
-       }
-       group.games[j+1] = current;
-   }
-}
-return group;
 }
 
 function fetchGroups(){
