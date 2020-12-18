@@ -2,7 +2,8 @@
 const bodyparser = require('body-parser')
 const express = require('express')
 const covDB = require('./cov_db')
-const covServices = require('./cov_services')(covDB)
+const sampleDB = require('./sampleDB')
+const covServices = require('./cov_services')(sampleDB) // (covDB)
 const covApi = require('./cov_web_api')(covServices)
 
 //Constants
@@ -18,14 +19,19 @@ app.use(function(err, req, rsp, next) {
 })
 
 app.get('/covida',checkAPI)
-app.get('/covida/games/search', covApi.searchGames)
-app.post('/covida/groups/create', covApi.createGroup)//TO DO body request name
-app.put('/covida/groups/edit/:groupId', covApi.editGroup)
-app.get('/covida/groups/list', covApi.listGroups)
-app.get('/covida/groups/show/:groupId', covApi.showGroup)
-app.post('/covida/groups/add/:groupId', covApi.addToGroup)
-app.delete('/covida/groups/remove/:groupId', covApi.removeFromGroup)
-app.get('/covida/groups/:groupId', covApi.getGamesBetween)
+app.get('/covida/games/', covApi.searchGames)
+app.post('/covida/groups/', covApi.createGroup)//TO DO body request name
+app.put('/covida/groups/:groupId', covApi.editGroup)
+app.get('/covida/groups/', covApi.listGroups)
+app.get('/covida/groups/:groupId', (req,res) => {
+  if(req.query.minRating || req.query.maxRating) covApi.getGamesBetween(req, res)
+  else covApi.showGroup(req, res)
+})
+app.post('/covida/groups/:groupId', covApi.addToGroup)
+app.delete('/covida/groups/:groupId', (req, res) => {
+  if(req.body.length > 0) covApi.removeFromGroup(req, res)
+  else covApi.deleteGroup(req, res)
+})
 
 app.listen(PORT, () => {
     console.log("server is running...")

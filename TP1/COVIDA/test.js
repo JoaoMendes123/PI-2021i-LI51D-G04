@@ -1,4 +1,4 @@
-/*'use strict'
+'use strict'
 const resources = require('./resources')
 const http = require('https')
 //const base_url = "https://api.igdb.com/v4/games/"
@@ -10,7 +10,7 @@ module.exports = {
     getGame
 }
 
-function igdbsearchGames(name) {
+function searchGames(name) {
     return new Promise((resolve, reject) => {
         const content = "fields name, total_rating, id; search \""+name+"\";"
         const options = {
@@ -30,7 +30,7 @@ function igdbsearchGames(name) {
             }) 
             res.on('close', () =>{
                 if(games.length > 2) resolve(games)
-                else reject(new resources.Error(`No matches found on the search for ${name}`, 406))
+                else reject(new resources.Error(`No matches found on the search for ${name}`, 400))
             })     
         })
         req.on('error', error =>{
@@ -60,9 +60,9 @@ function getGame(id){
                 game += d;
             }) 
             res.on('close', () =>{
-                if(res.statusCode == 200 && game.length > 2) resolve(JSON.parse(game))
-                else if(res.statusCode != 200) reject(new Error(`Error accessing IGDB API`, res.statusCode))
-                else reject(new resources.Error(`Cannot find game ${id}, please make sure the ID is valid`, 406))
+                console.log(res.statusCode)
+                if(res.statusCode == 200 && game.length > 2) return resolve(JSON.parse(game))
+                else return reject(new resources.Error(`Cannot find game ${id}, please make sure the ID is valid`, 400))
             })     
         })
         req.on('error', error =>{
@@ -72,111 +72,3 @@ function getGame(id){
         req.end()
     })    
 }
-
-function searchGames(str){
-    return new Promise((resolve, reject) => {
-        igdbsearchGames(str)
-            .then((games) => {
-                resolve(games)
-            })
-            .catch((error) => {
-                reject(error)
-            })
-    })
-}
-
-function createGroup(name, desc){
-    return new Promise((resolve, reject) => {
-        covDB.createGroup(name, desc)
-            .then((res) => {
-                resolve(res)
-            })
-            .catch((error) => {
-                reject(error)
-            })
-    })
-}
-
-function editGroup(group, name, desc){
-    return new Promise((resolve, reject) => {
-        covDB.editGroup(group, name, desc)
-            .then((res) => {
-                resolve(res)
-            })
-            .catch((error) => {
-                reject(error)
-            })
-    })
-}
-
-function listGroups(){
-    return new Promise((resolve, reject) => {
-        covDB.listGroups()
-            .then((res) => {
-                resolve(res)
-            })
-            .catch((error) => {
-                reject(error)
-            })
-    })
-}
-
-function showGroup(group){
-    return new Promise((resolve, reject) => {
-        covDB.showGroup(group) 
-            .then((res)=> {
-                resolve(res)
-            })
-            .catch((error) => {
-                reject(error)
-            })
-    })
-}
-
-function addToGroup(id, group){
-    return new Promise((resolve, reject) => {
-        getGame(id)
-            .then((game) => {
-                covDB.addToGroup(group, game[0])
-                    .then(resolve(game[0]))
-                    .catch((err) => reject(err))
-            })
-            .catch((err) => reject(err))
-    })
-}
-
-function removeFromGroup(game, group){
-    return new Promise((resolve, reject) => {
-        getGame(game)
-            .then((game) => {
-                removeFromGroup(group, game[0])
-                    .then((g) => resolve(g))
-                    .catch((err) => reject(err))
-                })
-            .catch((err) => reject(err))    
-    })
-}
-
-function getGamesBetween(group, max, min){
-    return new Promise((resolve, reject) => {
-        getGamesBetween(group, max, min)
-            .then((res) => {
-                resolve(res)
-            })
-            .catch((err) => reject(err))
-    })
-}
-
-function promiseTest() {
-    return new Promise((resolve, reject) => {
-        resolve({
-            name: "test1",
-            number: 12
-        })
-        reject("bye")
-    })
-}
-promiseTest().then((res) => {
-    console.log(res.name)
-    console.log(res.number)
-})*/

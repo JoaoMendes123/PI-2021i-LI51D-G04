@@ -1,7 +1,8 @@
 'use strict'
 const igdb = require('./igdb-data')
-module.exports = function(covDB) {
-    if(!covDB) {
+const sampleDB = require('./sampleDB')
+module.exports = function(sampleDB) { // module.exports = function(covDB) {
+    if(!sampleDB) {  // if(!covDB) {
       throw "Invalid covDB object"
     }
     
@@ -11,6 +12,7 @@ module.exports = function(covDB) {
         editGroup:editGroup,  
         listGroups:listGroups,
         showGroup:showGroup,
+        deleteGroup: deleteGroup,
         addToGroup:addToGroup,
         removeFromGroup:removeFromGroup,
         getGamesBetween:getGamesBetween
@@ -20,10 +22,10 @@ module.exports = function(covDB) {
     function searchGames(str){
         return new Promise((resolve, reject) => {
             igdb.searchGames(str)
-                .then((games) => {
+                .then(games => {
                     resolve(games)
                 })
-                .catch((error) => {
+                .catch(error => {
                     reject(error)
                 })
         })
@@ -31,49 +33,53 @@ module.exports = function(covDB) {
     
     function createGroup(name, desc){
         return new Promise((resolve, reject) => {
-            covDB.createGroup(name, desc)
-                .then((res) => {
-                    resolve(res)
-                })
-                .catch((error) => {
-                    reject(error)
-                })
+            sampleDB.createGroup(name, desc) //  covDB.createGroup(name, desc)
+                .then(res => {
+                    console.log(res)
+                    resolve(res)})
+                .catch(error => {
+                    console.log(err)
+                    reject(error)})
         })
     }
     
     function editGroup(groupID, name, desc){
         return new Promise((resolve, reject) => {
-            covDB.editGroup(groupID, name, desc)
-                .then((res) => {
-                    resolve(res)
-                })
-                .catch((error) => {
-                    reject(error)
-                })
+            sampleDB.editGroup(groupID, name, desc)
+                .then(res => resolve(res))
+                .catch(error => reject(error))
         })
     }
     
     function listGroups(){
         return new Promise((resolve, reject) => {
-            covDB.listGroups()
-                .then((res) => {
-                    resolve(res)
-                })
-                .catch((error) => {
-                    reject(error)
-                })
+            sampleDB.listGroups()
+                .then(res => {
+                    console.log(res)
+                    resolve(res)})
+                .catch(error => {
+                    console.log(error)
+                    reject(error)})
         })
     }
     
     function showGroup(groupID){
         return new Promise((resolve, reject) => {
-            covDB.showGroup(groupID) 
-                .then((res) => {
-                    resolve(res)
-                })
-                .catch((error) => {
-                    reject(error)
-                })
+            sampleDB.showGroup(groupID) 
+                .then(res => resolve(res))
+                .catch(error => reject(error))
+        })
+    }
+
+    function deleteGroup(groupID){
+        return new Promise((resolve, reject) => {
+            sampleDB.deleteGroup(groupID)
+                .then(res => {
+                    console.log(res)
+                    resolve(res)})
+                .catch(error => {
+                    console.log(error)
+                    reject(error)})
         })
     }
     
@@ -81,10 +87,11 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    covDB.addToGroup(groupID, game[0])
-                        .then((groupName) => {
+                    sampleDB.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
+                        .then((group) => {
+                            console.log(group)
                             resolve({
-                                group: groupName,
+                                group: group,
                                 game: game[0].name
                             })
 
@@ -99,7 +106,7 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    covDB.removeFromGroup(groupID, game[0])
+                    sampleDB.removeFromGroup(groupID, game[0])
                         .then((g) => resolve(g))
                         .catch((err) => reject(err))
                     })
@@ -109,12 +116,32 @@ module.exports = function(covDB) {
     
     function getGamesBetween(groupID, max, min){
         return new Promise((resolve, reject) => {
-            covDB.getGamesBetween(groupID, max, min)
-                .then((res) => {
-                    resolve(res)
+            var array = []
+            //var aux = []
+            sampleDB.showGroup(groupID)
+                .then(res => {
+                    array = res.games
                 })
                 .catch((err) => reject(err))
         })
     }
 
+    function sorted_game_insertion(array,game){
+        if(array.length == 0){
+           array.push(game);
+        }else{
+           array.push(game);
+           for (let i = 1; i < array.length; i++) {
+               let current = array[i];
+               let j = i-1; 
+               while ((j > -1) && (current.total_rating > array[j].total_rating || !array[j].total_rating )) {
+                   array[j+1] = array[j];
+                   j--;
+               }
+               array[j+1] = current;
+           }
+        }
+        console.log('11')
+        return array;
+        }
 } 

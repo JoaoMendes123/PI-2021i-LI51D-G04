@@ -10,13 +10,13 @@ const GROUPS_PATH = 'groups.json'
     function createGroup(group_name,group_description){
         return new Promise((promise,reject) =>{
             fs.readFile(GROUPS_PATH, (err, buffer) => {
-                if(err)return reject(new resources.Error(`Cant read  ${err}`,500))
+                if(err)return reject(new resources.dbError(`Cant read  ${err}`,500))
                 let groups = buffer.length > 0 ? JSON.parse(buffer) : []
                 let nextId = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
-                let res = new resources.Group(nextId,group_name,group_description,[])
+                let res = new resources.dbGroup(nextId,group_name,group_description,[])
                 groups.push(res)
                 fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                    if(err) return reject(new resources.Error(`Error Writing: ${err}`,500))
+                    if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
                     else promise(res)
                 })
             })
@@ -30,22 +30,22 @@ const GROUPS_PATH = 'groups.json'
     function addToGroup(group_id,game){
         return new Promise((promise, reject) => {
             fs.readFile(GROUPS_PATH, 'utf8', (err, buffer) => {
-                if(err) return reject(new resources.Error(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups, create one first`,404))
+                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups, create one first`,404))
                 var groups = JSON.parse(buffer)
-                if(!game.name) return reject(new resources.Error(`No such game found, make sure the ID is correct`,406))//dont know if i need this here
+                if(!game.name) return reject(new resources.dbError(`No such game found, make sure the ID is correct`,406))//dont know if i need this here
                 if(groups.find(group => group.id == group_id)){
                     groups.forEach(group => {  
                         if(group.id == group_id){
-                            if(group.games.find(g => g.id == game.id)) return reject(new resources.Error(`Can't add ${game.name} to group ${group.name} because it's already present`,409))
+                            if(group.games.find(g => g.id == game.id)) return reject(new resources.dbError(`Can't add ${game.name} to group ${group.name} because it's already present`,409))
                             group = sorted_game_insertion(group, game)
                             fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                                if(err) return reject(new resources.Error(`Error Writing: ${err}`,500))
+                                if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
                                 else promise(group)
                             })
                         }
                     })
-                }else return reject(new resources.Error(`Can't find group with id:${group_id}`,404))
+                }else return reject(new resources.dbError(`Can't find group with id:${group_id}`,404))
             })
         })
     }
@@ -55,8 +55,8 @@ const GROUPS_PATH = 'groups.json'
     function listGroups(){
         return new Promise((promise,reject) => {
             fs.readFile(GROUPS_PATH, (err,buffer) => {
-                if(err) return reject(new resources.Error(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups to be listed, create one first`,404))
+                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be listed, create one first`,404))
                 var groups = JSON.parse(buffer)
                 promise(groups)
             })
@@ -69,12 +69,12 @@ const GROUPS_PATH = 'groups.json'
     function showGroup(group_id){
         return new Promise((promise,reject)=>{
             fs.readFile(GROUPS_PATH, (err,buffer) => {
-                if(err) return reject(new resources.Error(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups to be shown, create one first`,404))
+                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be shown, create one first`,404))
                 var groups = JSON.parse(buffer)
                 var targetGroup = groups.find(group => group.id == group_id)
                 if(targetGroup) return promise(targetGroup)
-                else return reject(new resources.Error(`Can't find group with name id:${group_id}`,404))
+                else return reject(new resources.dbError(`Can't find group with name id:${group_id}`,404))
             })
         }) 
     }
@@ -87,19 +87,19 @@ const GROUPS_PATH = 'groups.json'
     function editGroup(group_id, name_update, description_update){
         return new Promise((promise,reject) =>{
             fs.readFile(GROUPS_PATH, (err, buffer) => {
-                if(err) return reject(new resources.Error(`Cant read  ${err}`,500))
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups to be edited, create one first`,404))
+                if(err) return reject(new resources.dbError(`Cant read  ${err}`,500))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to be edited, create one first`,404))
                 var groups = JSON.parse(buffer)
                 let targetGroup = groups.findIndex(group => group.id == group_id)
                 if(targetGroup != -1){
                     groups[targetGroup].name = name_update? name_update : groups[targetGroup].name
                     groups[targetGroup].description = description_update?  description_update : groups[targetGroup].description 
                     fs.writeFile(GROUPS_PATH, JSON.stringify(groups,null,`\t`), (err) => {
-                        if(err) return reject(new resources.Error(`Error Writing: ${err}`,500))
+                        if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
                         //Group with no games to display to user
-                        else return promise(new resources.Group(groups[targetGroup].id,groups[targetGroup].name,groups[targetGroup].description))
+                        else return promise(new resources.dbGroup(groups[targetGroup].id,groups[targetGroup].name,groups[targetGroup].description))
                     })
-                }else return reject(new resources.Error(`There is no group with id: ${group_id}`,404))
+                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,404))
             })
         })
     }
@@ -111,22 +111,22 @@ const GROUPS_PATH = 'groups.json'
     function removeFromGroup(group_id,game){
         return new Promise((promise,reject) =>{
             fs.readFile(GROUPS_PATH,(err,buffer)=>{
-                if(err) return reject(new resources.Error(`Cant read  ${err}`, 500))
+                if(err) return reject(new resources.dbError(`Cant read  ${err}`, 500))
                 var groups = JSON.parse(buffer)
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups to remove, create one first`,404))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to remove, create one first`,404))
                 if(groups.find(group => group.id == group_id)){
                     groups.forEach(group => {
                         if(group.id == group_id){
                             let target_index = group.games.findIndex(g => g.id == game.id)
-                            if(target_index == -1)return reject(new resources.Error(`Couldn't find game ${game.name} in group ${group.name}`,409))
+                            if(target_index == -1)return reject(new resources.dbError(`Couldn't find game ${game.name} in group ${group.name}`,409))
                             let game_removed = group.games.splice(target_index, 1)
                             fs.writeFile(GROUPS_PATH,JSON.stringify(groups,null,`\t`),err => {
-                                if(err) return reject(new resources.Error(`Error Writing: ${err}`,500))
+                                if(err) return reject(new resources.dbError(`Error Writing: ${err}`,500))
                                 return promise(game_removed)
                             })
                         }
                     })  
-                }else return reject(new resources.Error(`There is no group with id: ${group_id}`,404))
+                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,404))
             })
         }) 
     }
@@ -140,19 +140,19 @@ const GROUPS_PATH = 'groups.json'
         low = low == ""? 0 : low
         return new Promise((promise,reject) =>{
             fs.readFile(GROUPS_PATH,(err,buffer) => {
-                if(err) return reject(new resources.Error(`Error reading: ${err}`,500))
+                if(err) return reject(new resources.dbError(`Error reading: ${err}`,500))
                 var groups = JSON.parse(buffer)
-                if(buffer.length == 0) return reject(new resources.Error(`There are no groups to display, create one first`,404))
+                if(buffer.length == 0) return reject(new resources.dbError(`There are no groups to display, create one first`,404))
                 if(low > high) return reject(new resources.Error(`${low} to ${high} is not a valid interval`, 406))                
                 if(groups.find(group => group.id == group_id)){
                     groups.forEach(group => {
                         if(group.id == group_id && group.games.length != 0){
                             var res = group.games.filter(game => game.total_rating >= low && game.total_rating <= high)
                             if(res.length >= 1) return promise(res)
-                            else return reject(new resources.Error(`No games fit in given rating interval`,406))
-                        }else if(group.id == group_id && group.games.length == 0) return reject(new resources.Error(`Group ${group.name} doesn't have any games in it`,404))
+                            else return reject(new resources.dbError(`No games fit in given rating interval`,406))
+                        }else if(group.id == group_id && group.games.length == 0) return reject(new resources.dbError(`Group ${group.name} doesn't have any games in it`,404))
                     })
-                }else return reject(new resources.Error(`There is no group with id: ${group_id}`,500))
+                }else return reject(new resources.dbError(`There is no group with id: ${group_id}`,500))
             })
         })    
     }
