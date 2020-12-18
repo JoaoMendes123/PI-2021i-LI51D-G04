@@ -109,7 +109,9 @@ module.exports = function(covDB) {
         const length = games.length
         for(var i = 0; i < games.length; i++){
             let game = await igdb.getGame(games[i].id)
-            if(game[0].total_rating >= min && game[0].total_rating <= max) array = sorted_game_insertion(array, games[i])    
+            if(game[0].total_rating >= min && game[0].total_rating <= max){
+                array = sorted_game_insertion(array, games[i])    
+            }
         }
         return array
     }
