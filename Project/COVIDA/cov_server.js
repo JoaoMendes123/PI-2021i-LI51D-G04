@@ -2,7 +2,6 @@
 const bodyparser = require('body-parser')
 const express = require('express')
 const covDB = require('./cov_db')
-const sampleDB = require('./sampleDB')
 const covServices = require('./cov_services')(covDB)
 const covApi = require('./cov_web_api')(covServices)
 

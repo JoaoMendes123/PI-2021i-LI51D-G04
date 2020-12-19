@@ -1,16 +1,16 @@
-const GROUPS_PATH = 'groups.json'
 const ES_URL =  `http://localhost:9200`
-const { group } = require('console')
 const fetch = require('node-fetch')
 const { dbError,dbGroup,dbGame } = require('./resources.js')
 /**
  * TODO:
  *  Handle Erros in available functions
  *  
+ * changes:
+ *  Now it refreshes everytime u mess with the db for extra reliability
  */
 async function createGroup(group_name, group_description){
+    if(!group_name) throw new dbError(`No group name given`, 404)//what if its only a " "
     var groups = await fetchGroups()
-    console.log(groups.length)
     let _id = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
     let new_group = new dbGroup(_id,group_name,group_description,[])
     return fetch(ES_URL+`/groups/_doc/${_id}`,{
@@ -22,7 +22,9 @@ async function createGroup(group_name, group_description){
             "group":  new_group
         })
     })
-    .then(res => res.json())
+    .then(res => {
+        refreshDB()
+        return res.json()})
     .then(res => {if(res.result == 'created')return new_group})
 }
 /**
@@ -39,10 +41,12 @@ async function deleteGroup(group_id){
             'Content-Type': 'application/json'
         }
     })
-    .then(res => res.json())
     .then(res => {
-        if(res.result == 'not_found') throw new dbError(`There is no group with id: ${group_id}`,404)
-        if(res.result == 'deleted') return group_deleted
+        refreshDB()
+        return res.json()})
+    .then(res => {
+        if(res.result === 'not_found') throw new dbError(`There is no group with id: ${group_id}`,404)
+        else if(res.result === 'deleted') return group_deleted
     })
 
 }
@@ -73,7 +77,9 @@ async function addToGroup(group_id,game){
               }
         })
     })
-    .then(res => res.json())
+    .then(res =>{
+        refreshDB()
+        return res.json()})
     .then(res => {
         if(res.result == 'updated'){
             groups[group_index].games.push(game)
@@ -109,7 +115,9 @@ async function removeFromGroup(group_id, game_id){
                       }
                 })
             })
-            .then(res => res.json())
+            .then(res => {
+                refreshDB()
+                return res.json()})
             .then(res => {
                 if(res.result == 'deleted') return groups[group_index].name
             })
@@ -142,9 +150,10 @@ async function editGroup(group_id, name_update, description_update){
                   }
             })
         })
-        .then(res => res.json())
-        
-    }else throw new dbError("Group Not Found",404)
+        .then(res => {
+            refreshDB()
+            return res.json()})
+        }else throw new dbError("Group Not Found",404)
 }
 /**
  * returns all groups
@@ -207,8 +216,16 @@ function fetchGroups(){
         return aux
     })
 }
+function refreshDB(){
+    return fetch(ES_URL+`/groups/_refresh`,{
+        method: 'GET',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+}
 //createGroup('oi','desck212').then(res => console.log(res)).catch(err => console.log(JSON.stringify(err)))
-//deleteGroup(0).then(res =>console.log(res)).catch(err => console.log(err))
+//deleteGroup(9999).then(res =>console.log(res)).catch(err => console.log(err))
 //fetchGroups().then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))
 //addToGroup(2,new dbGame(6,'game_name')).then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))
 //removeFromGroup(3,1273).then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))
