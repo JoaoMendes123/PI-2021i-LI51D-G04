@@ -99,27 +99,28 @@ async function removeFromGroup(group_id, game_id, idx = ES_IDX){
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index = groups.findIndex(group => group.id == group_id)
     if(group_index !=-1){
-        removedGame = groups[group_index].games.find(g => g.id == game_id)
-        if(removedGame != -1){
-            return fetch(ES_URL+idx+`/_update/${group_id}`,{
-                method:'POST',
+        const gameIndex = groups[group_index].games.findIndex(g => g.id == game_id)
+        if(gameIndex != -1){
+            var group = groups[group_index]
+            group.games.splice(gameIndex, 1)
+            console.log(group)
+            return fetch(ES_URL+idx+`/_doc/${group_id}`,{
+                method:'PUT',
                 headers:{
                     'Content-Type': 'application/json'
                 },
-                body:JSON.stringify({
-                    "script": {
-                        "source": "ctx._source.group.games.remove(params.game)",
-                        "lang": "painless",
-                        "params": {
-                            "game": removedGame
-                          }
-                      }
+                body: JSON.stringify({
+                    'group': {
+                    'name': group.name,
+                    'id': group.id,
+                    'description': group.description,
+                    'games': group.games
+                    }
                 })
             })
+            .then(res => res.json())
             .then(res => {
-                refreshDB(idx)
-                return res.json()})
-            .then(res => {
+                console.log(res)
                 if(res.result == 'deleted') return groups[group_index].name
             })
             
@@ -150,6 +151,7 @@ async function editGroup(group_id, name_update, description_update,idx = ES_IDX)
                   }
             })
         })
+        .then(res => res.json())
         .then(res => {
             refreshDB(idx)
             if(res.result == 'updated')return groups[group_index]})
@@ -213,7 +215,7 @@ function refreshDB(idx){
     })
 }
 //createGroup('oi','desck212').then(res => console.log(res)).catch(err => console.log(JSON.stringify(err)))
-//deleteGroup(9999).then(res =>console.log(res)).catch(err => console.log(err))
+//deleteGroup(0, "/test").then(res =>console.log(res)).catch(err => console.log(err))
 //fetchGroups().then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))
 //addToGroup(2,new dbGame(6,'game_name')).then(res => console.log(JSON.stringify(res,null,`\t`))).catch(err => console.log(err))
 //removeFromGroup(3,1273).then(aux => console.log(JSON.stringify(aux,null,`\t`))).catch(err => console.log(err))

@@ -92,8 +92,10 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    covDB.removeFromGroup(groupID, game[0])
-                        .then((g) => resolve(g))
+                    covDB.removeFromGroup(groupID, game[0].id)
+                        .then((g) => {
+                            console.log(g)
+                            resolve(g)})
                         .catch((err) => reject(err))
                     })
                 .catch((err) => reject(err))    

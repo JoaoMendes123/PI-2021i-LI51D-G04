@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1608406683990" clover="3.2.0">
+  <project timestamp="1608406683991" name="All files">
+    <metrics statements="78" coveredstatements="35" conditionals="51" coveredconditionals="8" methods="41" coveredmethods="15" elements="170" coveredelements="58" complexity="0" loc="78" ncloc="78" packages="1" files="2" classes="2"/>
+    <file name="cov_db.js" path="C:\Users\Leandro\Desktop\ISEL\PI\project\PI-2021i-LI51D-G04\Project\COVIDA\cov_db.js">
+      <metrics statements="72" coveredstatements="31" conditionals="49" coveredconditionals="8" methods="37" coveredmethods="13"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="2" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="13" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="14" count="1" type="stmt"/>
+      <line num="15" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="16" count="1" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="27" count="1" type="stmt"/>
+      <line num="28" count="1" type="stmt"/>
+      <line num="30" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="37" count="4" type="stmt"/>
+      <line num="38" count="3" type="cond" truecount="1" falsecount="1"/>
+      <line num="39" count="3" type="stmt"/>
+      <line num="40" count="3" type="stmt"/>
+      <line num="47" count="3" type="stmt"/>
+      <line num="48" count="3" type="stmt"/>
+      <line num="50" count="3" type="cond" truecount="2" falsecount="0"/>
+      <line num="51" count="2" type="cond" truecount="1" falsecount="1"/>
+      <line num="61" count="0" type="stmt"/>
+      <line num="62" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="63" count="0" type="stmt"/>
+      <line num="64" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="65" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="66" count="0" type="stmt"/>
+      <line num="67" count="0" type="stmt"/>
+      <line num="83" count="0" type="stmt"/>
+      <line num="84" count="0" type="stmt"/>
+      <line num="86" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="87" count="0" type="stmt"/>
+      <line num="88" count="0" type="stmt"/>
+      <line num="98" count="0" type="stmt"/>
+      <line num="99" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="100" count="0" type="stmt"/>
+      <line num="101" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="102" count="0" type="stmt"/>
+      <line num="103" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="104" count="0" type="stmt"/>
+      <line num="120" count="0" type="stmt"/>
+      <line num="121" count="0" type="stmt"/>
+      <line num="123" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="126" count="0" type="stmt"/>
+      <line num="127" count="0" type="stmt"/>
+      <line num="136" count="0" type="stmt"/>
+      <line num="137" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="138" count="0" type="stmt"/>
+      <line num="139" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="140" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="141" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="142" count="0" type="stmt"/>
+      <line num="154" count="0" type="stmt"/>
+      <line num="155" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="156" count="0" type="stmt"/>
+      <line num="162" count="0" type="stmt"/>
+      <line num="169" count="0" type="stmt"/>
+      <line num="170" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="171" count="0" type="stmt"/>
+      <line num="172" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="173" count="0" type="stmt"/>
+      <line num="174" count="0" type="stmt"/>
+      <line num="176" count="1" type="stmt"/>
+      <line num="187" count="5" type="stmt"/>
+      <line num="196" count="4" type="stmt"/>
+      <line num="198" count="4" type="stmt"/>
+      <line num="199" count="4" type="stmt"/>
+      <line num="200" count="4" type="stmt"/>
+      <line num="201" count="4" type="stmt"/>
+      <line num="202" count="4" type="stmt"/>
+      <line num="204" count="4" type="stmt"/>
+      <line num="208" count="4" type="stmt"/>
+      <line num="216" count="1" type="stmt"/>
+    </file>
+    <file name="resources.js" path="C:\Users\Leandro\Desktop\ISEL\PI\project\PI-2021i-LI51D-G04\Project\COVIDA\resources.js">
+      <metrics statements="6" coveredstatements="4" conditionals="2" coveredconditionals="0" methods="4" coveredmethods="2"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="9" count="0" type="stmt"/>
+      <line num="14" count="3" type="stmt"/>
+      <line num="15" count="3" type="stmt"/>
+      <line num="19" count="6" type="stmt"/>
+      <line num="26" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>
