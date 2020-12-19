@@ -82,7 +82,9 @@ module.exports = function(covDB) {
                         })
                         .catch((err) => reject(err))
                 })
-                .catch((err) => reject(err))
+                .catch((err) => {
+                    reject(err)
+                })
         })
     }
     

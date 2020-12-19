@@ -19,7 +19,7 @@ app.use(function(err, req, rsp, next) {
 
 app.get('/covida',checkAPI)
 app.get('/covida/games/', covApi.searchGames)
-app.post('/covida/groups/', covApi.createGroup)//TO DO body request name
+app.post('/covida/groups/', covApi.createGroup)
 app.put('/covida/groups/:groupId', covApi.editGroup)
 app.get('/covida/groups/', covApi.listGroups)
 app.get('/covida/groups/:groupId', (req,res) => {

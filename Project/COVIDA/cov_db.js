@@ -1,4 +1,5 @@
 const ES_URL =  `http://localhost:9200`
+const ES_IDX = `/groups`
 const fetch = require('node-fetch')
 const { dbError,dbGroup,dbGame } = require('./resources.js')
 /**
@@ -8,14 +9,12 @@ const { dbError,dbGroup,dbGame } = require('./resources.js')
  * changes:
  *  Now it refreshes everytime u mess with the db for extra reliability
  */
-async function createGroup(group_name, group_description){
-    if(!group_name) throw new dbError(`No group name given`, 404)//what if its only a " "
-        var groups = await fetchGroups().catch(err => {
-            throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-        })
+async function createGroup(group_name, group_description, idx = ES_IDX){
+    if(!group_name) throw new dbError(`No group name given`, 404)
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     let _id = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
     let new_group = new dbGroup(_id,group_name,group_description,[])
-    return fetch(ES_URL+`/groups/_doc/${_id}`,{
+    return fetch(ES_URL+idx+`/_doc/${_id}`,{
         method: 'PUT',
         headers:{
             'Content-Type': 'application/json'
@@ -25,21 +24,20 @@ async function createGroup(group_name, group_description){
         })
     })
     .then(res => {
-        refreshDB()
-        return res.json()})
+        refreshDB(idx)
+        return res.json()
+    })
     .then(res => {if(res.result == 'created')return new_group})
 }
 /**
  * deletes group from BD and returns removed group
  * @param {id of group to be deleted} group_id 
  */
-async function deleteGroup(group_id){
-    var groups = await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function deleteGroup(group_id,idx = ES_IDX){
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_deleted = groups.find(group => group.id == group_id)
-    return fetch(ES_URL+`/groups/_doc/${group_id}`,{
+    return fetch(ES_URL+idx+`/_doc/${group_id}`,{
         method: 'DELETE',
         headers:{
             'Content-Type': 'application/json'
@@ -59,16 +57,14 @@ async function deleteGroup(group_id){
  * @param {group to change} group_id 
  * @param {game to add} game 
  */
-async function addToGroup(group_id,game){
-    var groups = await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function addToGroup(group_id,game,idx = ES_IDX){
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index = groups.findIndex(group => group.id == group_id)
     if(group_index !=-1){
         if(groups[group_index].games.find(g => g.id == game.id)) throw new dbError(`Game already in group`,409)
     }else throw new dbError(`Group given not found `,404)
-    return fetch(ES_URL+`/groups/_update/${group_id}`,{
+    return fetch(ES_URL+idx+`/_update/${group_id}`,{
         method:'POST',
         headers:{
             'Content-Type': 'application/json'
@@ -84,7 +80,7 @@ async function addToGroup(group_id,game){
         })
     })
     .then(res =>{
-        refreshDB()
+        refreshDB(idx)
         return res.json()})
     .then(res => {
         if(res.result == 'updated'){
@@ -92,23 +88,20 @@ async function addToGroup(group_id,game){
             return groups[group_index]
         }  
     })
-    
 }
 /**
  * removes specific game from a specific group and returns name of group affected
  * @param {group to change} group_id 
  * @param {agme to remove} game_id 
  */
-async function removeFromGroup(group_id, game_id){
-    var groups = await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function removeFromGroup(group_id, game_id, idx = ES_IDX){
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index = groups.findIndex(group => group.id == group_id)
     if(group_index !=-1){
-        removedGame = groups[group_index].games.findIndex(g => g.id == game_id)
+        removedGame = groups[group_index].games.find(g => g.id == game_id)
         if(removedGame != -1){
-            return fetch(ES_URL+`/groups/_update/${group_id}`,{
+            return fetch(ES_URL+idx+`/_update/${group_id}`,{
                 method:'POST',
                 headers:{
                     'Content-Type': 'application/json'
@@ -124,7 +117,7 @@ async function removeFromGroup(group_id, game_id){
                 })
             })
             .then(res => {
-                refreshDB()
+                refreshDB(idx)
                 return res.json()})
             .then(res => {
                 if(res.result == 'deleted') return groups[group_index].name
@@ -139,16 +132,14 @@ async function removeFromGroup(group_id, game_id){
  * @param {update to name field} name_update can be null
  * @param {uptade to description field} description_update can be null
  */
-async function editGroup(group_id, name_update, description_update){
-    var groups = await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function editGroup(group_id, name_update, description_update,idx = ES_IDX){
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index =  groups.findIndex(group => group.id == group_id)
     if(group_index != -1){
         groups[group_index].name = name_update? name_update:groups[group_index].name
         groups[group_index].description = description_update?  description_update : groups[group_index].description
-        return fetch(ES_URL+`/groups/_update/${group_id}`,{
+        return fetch(ES_URL+idx+`/_update/${group_id}`,{
             method:'POST',
             headers:{
                 'Content-Type': 'application/json'
@@ -160,41 +151,28 @@ async function editGroup(group_id, name_update, description_update){
             })
         })
         .then(res => {
-            refreshDB()
-            return res.json()})
-        .then(res => {
-            if(res.result == 'updated') return groups[group_index]
-        })    
+            refreshDB(idx)
+            if(res.result == 'updated')return groups[group_index]})
         }else throw new dbError("Group Not Found",404)
 }
 /**
  * returns all groups
  */
-async function listGroups(){
-    return await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function listGroups(idx = ES_IDX){
+    return await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
 }
 /**
  * return specified group
  * @param {group to be shown} group_id 
  */
-async function showGroup(group_id){
-    let groups = await fetchGroups().catch(err => {
-        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
-    })
+async function showGroup(group_id,idx = ES_IDX){
+    let groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
     if(groups.length == 0) throw new dbError('No groups in DB',404)
     group_index = groups.findIndex(group => group.id == group_id)
     if(group_index != -1){
         return groups[group_index]
     }else throw new dbError('Group Not Found',404)
-
 }
-/**
- * returns the group with given id to cov_services
- * @param {group to be shown} group_id 
- */
-
 module.exports = {
     createGroup: createGroup,
     deleteGroup:deleteGroup,
@@ -205,8 +183,8 @@ module.exports = {
     editGroup: editGroup,
 }
 
-function fetchGroups(){
-    return fetch(ES_URL+`/groups/_search`,{
+function fetchGroups(idx){
+    return fetch(ES_URL+idx+`/_search`,{
         method: 'POST',
         headers:{
             'Content-Type': 'application/json'
@@ -226,8 +204,8 @@ function fetchGroups(){
         return aux
     })
 }
-function refreshDB(){
-    return fetch(ES_URL+`/groups/_refresh`,{
+function refreshDB(idx){
+    return fetch(ES_URL+idx+`/_refresh`,{
         method: 'GET',
         headers:{
             'Content-Type': 'application/json'
