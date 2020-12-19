@@ -19,7 +19,7 @@ app.use(function(err, req, rsp, next) {
 
 app.get('/covida',checkAPI)
 app.get('/covida/games/', covApi.searchGames)
-app.post('/covida/groups/', covApi.createGroup)//TO DO body request name
+app.post('/covida/groups/', covApi.createGroup)
 app.put('/covida/groups/:groupId', covApi.editGroup)
 app.get('/covida/groups/', covApi.listGroups)
 app.get('/covida/groups/:groupId', (req,res) => {
@@ -28,7 +28,7 @@ app.get('/covida/groups/:groupId', (req,res) => {
 })
 app.post('/covida/groups/:groupId', covApi.addToGroup)
 app.delete('/covida/groups/:groupId', (req, res) => {
-  if(req.body.length > 0) covApi.removeFromGroup(req, res)
+  if(req.body) covApi.removeFromGroup(req, res)
   else covApi.deleteGroup(req, res)
 })
 

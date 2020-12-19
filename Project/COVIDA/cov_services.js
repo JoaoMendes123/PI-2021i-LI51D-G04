@@ -70,7 +70,7 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    cov.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
+                    covDB.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
                         .then((group) => {
                             resolve({
                                 group: group,
@@ -80,7 +80,9 @@ module.exports = function(covDB) {
                         })
                         .catch((err) => reject(err))
                 })
-                .catch((err) => reject(err))
+                .catch((err) => {
+                    reject(err)
+                })
         })
     }
     
@@ -98,7 +100,7 @@ module.exports = function(covDB) {
     
     async function getGamesBetween(groupID, max = 100, min = 0){
             var array = []
-            var group = await sampleDB.showGroup(groupID)
+            var group = await covDB.showGroup(groupID)
             array = await createSortedArray(group.games, max, min)
             group.games = array
             return group

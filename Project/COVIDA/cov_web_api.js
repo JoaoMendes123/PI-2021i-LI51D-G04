@@ -71,6 +71,7 @@ module.exports = function (covServices) {
         if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
         if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
         const groupId = req.params.groupId
+        console.log(req.body.gameID)
         covServices.removeFromGroup(groupId, req.body.gameID)
             .then(game => sendSuccess(req,rsp,new Answer("Game successfully removed", game),200) )
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
