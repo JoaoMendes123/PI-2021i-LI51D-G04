@@ -23,7 +23,7 @@ function Group(group_id,group_name, group_description = "", games=[]) {
 }
 //Game Objects to use in igdb_data
 function Game(id, name){
-    this.id = id,
-    this.name = name
+    this.name = name,
+    this.id = id
 }
 

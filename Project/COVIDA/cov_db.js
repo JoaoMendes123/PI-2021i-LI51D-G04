@@ -10,7 +10,9 @@ const { dbError,dbGroup,dbGame } = require('./resources.js')
  */
 async function createGroup(group_name, group_description){
     if(!group_name) throw new dbError(`No group name given`, 404)//what if its only a " "
-    var groups = await fetchGroups()
+        var groups = await fetchGroups().catch(err => {
+            throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+        })
     let _id = groups.length > 0 ? Math.max.apply(null, groups.map(group => group.id)) + 1 : 0
     let new_group = new dbGroup(_id,group_name,group_description,[])
     return fetch(ES_URL+`/groups/_doc/${_id}`,{
@@ -32,7 +34,9 @@ async function createGroup(group_name, group_description){
  * @param {id of group to be deleted} group_id 
  */
 async function deleteGroup(group_id){
-    var groups = await fetchGroups()
+    var groups = await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_deleted = groups.find(group => group.id == group_id)
     return fetch(ES_URL+`/groups/_doc/${group_id}`,{
@@ -56,11 +60,13 @@ async function deleteGroup(group_id){
  * @param {game to add} game 
  */
 async function addToGroup(group_id,game){
-    var groups = await fetchGroups()
+    var groups = await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index = groups.findIndex(group => group.id == group_id)
     if(group_index !=-1){
-        if(groups[group_index].games.find(g => g.id == game.id)) throw new dbError(`Game already in group `,404)
+        if(groups[group_index].games.find(g => g.id == game.id)) throw new dbError(`Game already in group`,409)
     }else throw new dbError(`Group given not found `,404)
     return fetch(ES_URL+`/groups/_update/${group_id}`,{
         method:'POST',
@@ -94,7 +100,9 @@ async function addToGroup(group_id,game){
  * @param {agme to remove} game_id 
  */
 async function removeFromGroup(group_id, game_id){
-    var groups = await fetchGroups()
+    var groups = await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index = groups.findIndex(group => group.id == group_id)
     if(group_index !=-1){
@@ -122,7 +130,7 @@ async function removeFromGroup(group_id, game_id){
                 if(res.result == 'deleted') return groups[group_index].name
             })
             
-        }else  throw new dbError('Game not in group',404)
+        }else  throw new dbError('Game not in group',409)
     }else throw new dbError('Group given not found ',404)
 }
 /**
@@ -132,8 +140,9 @@ async function removeFromGroup(group_id, game_id){
  * @param {uptade to description field} description_update can be null
  */
 async function editGroup(group_id, name_update, description_update){
-    var groups = await fetchGroups()
-    if(name_update)
+    var groups = await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
     if(groups.length==0) throw new dbError(`There are no groups in DB`,404)
     let group_index =  groups.findIndex(group => group.id == group_id)
     if(group_index != -1){
@@ -153,21 +162,28 @@ async function editGroup(group_id, name_update, description_update){
         .then(res => {
             refreshDB()
             return res.json()})
+        .then(res => {
+            if(res.result == 'updated') return groups[group_index]
+        })    
         }else throw new dbError("Group Not Found",404)
 }
 /**
  * returns all groups
  */
 async function listGroups(){
-    return await fetchGroups()
+    return await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
 }
 /**
  * return specified group
  * @param {group to be shown} group_id 
  */
 async function showGroup(group_id){
-    let groups = await fetchGroups()
-    if(groups.length == 0) throw new dbError('No groups in DB',500)
+    let groups = await fetchGroups().catch(err => {
+        throw new dbError(`Could not retrieve Groups information, please try again later`,502)
+    })
+    if(groups.length == 0) throw new dbError('No groups in DB',404)
     group_index = groups.findIndex(group => group.id == group_id)
     if(group_index != -1){
         return groups[group_index]
@@ -178,11 +194,6 @@ async function showGroup(group_id){
  * returns the group with given id to cov_services
  * @param {group to be shown} group_id 
  */
-async function getGamesBetween(group_id){
-    return await showGroup(group_id)
-}
-
-
 
 module.exports = {
     createGroup: createGroup,
@@ -192,7 +203,6 @@ module.exports = {
     listGroups: listGroups,
     showGroup: showGroup,
     editGroup: editGroup,
-    getGamesBetween: getGamesBetween
 }
 
 function fetchGroups(){

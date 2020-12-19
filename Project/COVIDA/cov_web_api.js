@@ -24,7 +24,7 @@ module.exports = function (covServices) {
     }
 
     function createGroup(req, rsp){
-        if(!req.body.name) return rsp.status(400).json(new Error(`Invalid body syntax, please make sure body params are according to the documentation.`, req.originalUrl))
+        if(!req.body.name) return rsp.status(400).json(new Error(`Invalid body syntax- Cannot find group name - Please make sure body params are according to the documentation.`, req.originalUrl))
         const groupName = req.body.name
         covServices.createGroup(groupName, req.body.desc)
             .then(succ => sendSuccess(req,rsp,new Answer(`Group sucessfully Created.`,succ),201))

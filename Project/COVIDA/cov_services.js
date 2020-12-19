@@ -1,5 +1,6 @@
 'use strict'
 const igdb = require('./igdb-data')
+const {dbGame} = require('./resources')
 module.exports = function(covDB) {
     if(!covDB) {
       throw "Invalid covDB object"
@@ -70,11 +71,12 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    cov.addToGroup(groupID, game[0]) //covDB.addToGroup(groupID, game[0])
+                    var g = new dbGame(game[0].id, game[0].name)
+                    covDB.addToGroup(groupID, g) //covDB.addToGroup(groupID, game[0])
                         .then((group) => {
                             resolve({
                                 group: group,
-                                game: game[0].name
+                                game: g.name
                             })
 
                         })
@@ -98,7 +100,7 @@ module.exports = function(covDB) {
     
     async function getGamesBetween(groupID, max = 100, min = 0){
             var array = []
-            var group = await sampleDB.showGroup(groupID)
+            var group = await covDB.showGroup(groupID)
             array = await createSortedArray(group.games, max, min)
             group.games = array
             return group
@@ -110,7 +112,7 @@ module.exports = function(covDB) {
         for(var i = 0; i < games.length; i++){
             let game = await igdb.getGame(games[i].id)
             if(game[0].total_rating >= min && game[0].total_rating <= max){
-                array = sorted_game_insertion(array, games[i])    
+                array = sorted_game_insertion(array, game[0])    
             }
         }
         return array

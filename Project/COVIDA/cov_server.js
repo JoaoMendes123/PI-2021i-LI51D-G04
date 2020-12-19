@@ -28,7 +28,7 @@ app.get('/covida/groups/:groupId', (req,res) => {
 })
 app.post('/covida/groups/:groupId', covApi.addToGroup)
 app.delete('/covida/groups/:groupId', (req, res) => {
-  if(req.body.length > 0) covApi.removeFromGroup(req, res)
+  if(!Object.keys(req.body).length == 0) covApi.removeFromGroup(req, res)
   else covApi.deleteGroup(req, res)
 })
 
