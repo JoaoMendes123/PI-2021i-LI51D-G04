@@ -103,7 +103,6 @@ async function removeFromGroup(group_id, game_id, idx = ES_IDX){
         if(gameIndex != -1){
             var group = groups[group_index]
             group.games.splice(gameIndex, 1)
-            console.log(group)
             return fetch(ES_URL+idx+`/_doc/${group_id}`,{
                 method:'PUT',
                 headers:{
@@ -120,8 +119,7 @@ async function removeFromGroup(group_id, game_id, idx = ES_IDX){
             })
             .then(res => res.json())
             .then(res => {
-                console.log(res)
-                if(res.result == 'deleted') return groups[group_index].name
+                if(res.result == 'updated') return groups[group_index]
             })
             
         }else  throw new dbError('Game not in group',409)
@@ -154,14 +152,30 @@ async function editGroup(group_id, name_update, description_update,idx = ES_IDX)
         .then(res => res.json())
         .then(res => {
             refreshDB(idx)
-            if(res.result == 'updated')return groups[group_index]})
+            return {
+                group: {
+                    id: groups[group_index].id,
+                    name: groups[group_index].name,
+                    description: groups[group_index].description
+                },
+                result: res.result
+            }
+        })
         }else throw new dbError("Group Not Found",404)
 }
 /**
  * returns all groups
  */
 async function listGroups(idx = ES_IDX){
-    return await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
+    var groups = await fetchGroups(idx).catch(err => {throw new dbError('Could not retrieve Groups information, please try again later',502)})
+    var newGroups = groups.map(group => {
+        return {
+            id: group.id,
+            name: group.name,
+            description: group.description
+        }
+    })
+    return newGroups
 }
 /**
  * return specified group

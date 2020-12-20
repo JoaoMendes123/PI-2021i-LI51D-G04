@@ -34,7 +34,10 @@ module.exports = function (covServices) {
         if(!req.body.newName && !req.body.newDesc) return rsp.status(422).json(new Error(`Invalid body syntax, please make sure body params are according to the documentation.`, req.originalUrl))
         const groupId = req.params.groupId
         covServices.editGroup(groupId, req.body.newName, req.body.newDesc)
-            .then(succ => sendSuccess(req,rsp,new Answer(`Group sucessfully edited.`,succ),200))
+            .then(succ => {
+                if(succ.result == 'noop') sendSuccess(req,rsp, new Answer(`Group was not modified`, succ.group), 200)
+                else sendSuccess(req,rsp,new Answer(`Group sucessfully edited.`,succ.group),200)
+            })
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
@@ -72,12 +75,12 @@ module.exports = function (covServices) {
         if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
         const groupId = req.params.groupId
         covServices.removeFromGroup(groupId, req.body.gameID)
-            .then(game => sendSuccess(req,rsp,new Answer("Game successfully removed", game),200) )
+            .then(res => sendSuccess(req,rsp,new Answer(`Game ${res.game} successfully removed from group ${res.group.name}`, res.group),200) )
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
     function getGamesBetween(req, rsp){
-         const groupId = req.params.groupId
+        const groupId = req.params.groupId
         covServices.getGamesBetween(groupId, req.query.maxRating, req.query.minRating)
             .then(succ => sendSuccess(req,rsp,new Answer('Games that fit interval:',succ),200))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))

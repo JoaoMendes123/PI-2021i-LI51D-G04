@@ -92,18 +92,27 @@ module.exports = function(covDB) {
         return new Promise((resolve, reject) => {
             igdb.getGame(gameID)
                 .then((game) => {
-                    covDB.removeFromGroup(groupID, game[0].id)
-                        .then((g) => {
-                            console.log(g)
-                            resolve(g)})
+                    var g = new dbGame(game[0].id, game[0].name)
+                    covDB.removeFromGroup(groupID, g.id)
+                        .then((group) => {
+                            console.log(group)
+                            console.log(game)
+                            resolve({
+                                group: group,
+                                game: g.name
+                            })
+                        })
                         .catch((err) => reject(err))
                     })
                 .catch((err) => reject(err))    
         })
     }
     
-    async function getGamesBetween(groupID, max = 100, min = 0){
+    async function getGamesBetween(groupID, max, min){
             var array = []
+            console.log(max)
+            max = max == "" ? 100 : max
+            min = min == "" ? 0 : min
             var group = await covDB.showGroup(groupID)
             array = await createSortedArray(group.games, max, min)
             group.games = array
@@ -112,6 +121,7 @@ module.exports = function(covDB) {
 
     async function createSortedArray(games, max, min){
         var array = []
+        console.log(max)
         const length = games.length
         for(var i = 0; i < games.length; i++){
             let game = await igdb.getGame(games[i].id)

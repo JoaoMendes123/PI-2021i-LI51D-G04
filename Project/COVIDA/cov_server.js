@@ -23,7 +23,7 @@ app.post('/covida/groups/', covApi.createGroup)
 app.put('/covida/groups/:groupId', covApi.editGroup)
 app.get('/covida/groups/', covApi.listGroups)
 app.get('/covida/groups/:groupId', (req,res) => {
-  if(req.query.minRating || req.query.maxRating) covApi.getGamesBetween(req, res)
+  if(!Object.keys(req.query).length == 0) covApi.getGamesBetween(req, res)
   else covApi.showGroup(req, res)
 })
 app.post('/covida/groups/:groupId', covApi.addToGroup)
