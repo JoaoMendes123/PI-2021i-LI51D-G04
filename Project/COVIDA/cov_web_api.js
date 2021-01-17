@@ -1,20 +1,27 @@
 'use strict'
 
+const express = require('express')
 module.exports = function (covServices) {
     if(!covServices) {
       throw "Invalid covServices object"
     }
-    return{
-        searchGames: searchGames,
-        createGroup: createGroup,
-        editGroup: editGroup,
-        listGroups: listGroups,
-        showGroup: showGroup,
-        deleteGroup: deleteGroup,
-        addToGroup: addToGroup,
-        removeFromGroup: removeFromGroup,
-        getGamesBetween: getGamesBetween
-    }
+
+    const router = express.Router()
+
+    router.get('/games/', searchGames)
+    router.post('/groups/', createGroup)
+    router.put('/groups/:groupId', editGroup)
+    router.get('/groups/', listGroups)
+    router.get('/groups/:groupId', (req,res) => {
+        if(!Object.keys(req.query).length == 0) getGamesBetween(req, res)
+        else showGroup(req, res)
+    })
+    router.post('/groups/:groupId', addToGroup)
+    router.delete('/groups/:groupId', (req, res) => {
+        if(!Object.keys(req.body).length == 0) removeFromGroup(req, res)
+        else deleteGroup(req, res)
+    })
+    return router
     
     function searchGames(req, rsp){
         if(!req.query.name) return rsp.status(422).json(new Error(`Invalid query syntax, please make sure query params are according to the documentation.`, req.originalUrl))
@@ -63,7 +70,7 @@ module.exports = function (covServices) {
 
     function addToGroup(req, rsp){
         if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-        if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`, req.originalUrl))
+        if(isNaN(req.body.gameID)) return rsp.status(422).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`, req.originalUrl))
         const groupId = req.params.groupId
         covServices.addToGroup(req.body.gameID, groupId)
             .then(res => sendSuccess(req,rsp,new Answer(`Game ${res.game} successfully added to group ${res.group.name}`, res.group),200))
@@ -72,7 +79,7 @@ module.exports = function (covServices) {
 
     function removeFromGroup(req, rsp){
         if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-        if(isNaN(req.body.gameID)) return rsp.status(406).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
+        if(isNaN(req.body.gameID)) return rsp.status(422).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
         const groupId = req.params.groupId
         covServices.removeFromGroup(groupId, req.body.gameID)
             .then(res => sendSuccess(req,rsp,new Answer(`Game ${res.game} successfully removed from group ${res.group.name}`, res.group),200) )

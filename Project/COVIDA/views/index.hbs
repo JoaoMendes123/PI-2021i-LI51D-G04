@@ -1,0 +1,29 @@
+<form class="d-flex" method="GET" action="/site/games/?name={{name}}">
+        <input class="form-control" type="text" name="name" id="id" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+<div class="d-grid gap-2 col-6 mx-auto">
+<h1 style="text-align:center">Your Groups</h1>
+<a class="btn btn-primary float-center" style="float:center" href="/site/groups/new" role="button">Create Group</a>
+</div>
+<div class="container">
+    <div class="accordion accordion-flush" id="accordionFlushExample">
+        {{#each groups}}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{id}}" aria-expanded="false" aria-controls="flush-collapseOne">
+                        {{name}}
+                     </button>
+                </h2>
+                <div id="flush-collapse{{id}}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body">{{description}}</div>
+                        <form method="POST" action="./groups/{{id}}?_method=DELETE">
+                            <a class="btn btn-primary" href="/site/groups/{{id}}" role="button">Show Group</a>
+                            <a class="btn btn-primary" href="/site/groups/{{id}}/edit" role="button">Edit Group</a>
+                            <input type="submit" class="btn btn-primary" value="Delete Group"></input>
+                        </form>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>

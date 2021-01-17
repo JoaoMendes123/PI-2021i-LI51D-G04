@@ -1,36 +1,33 @@
 //Dependencies
 const bodyparser = require('body-parser')
 const express = require('express')
+const sitemap = require('express-sitemap-html')
+const path = require('path')
 const covDB = require('./cov_db')
 const covServices = require('./cov_services')(covDB)
-const covApi = require('./cov_web_api')(covServices)
+const covApiRouter = require('./cov_web_api')(covServices)
+const covSiteRouter = require('./cov_web_site')(covServices)
 
 //Constants
 const PORT = 8000
 const app = express()
 app.use(express.json())
+app.use(express.urlencoded())
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(bodyparser.json())
+
+
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'hbs')
 
 app.use(function(err, req, rsp, next) {
   if(err instanceof SyntaxError && err.status === 400 && "body" in err) {
     rsp.status(400).json("Error parsing body, body is not a valid JSON object.")
   }else next()
 })
-
 app.get('/covida',checkAPI)
-app.get('/covida/games/', covApi.searchGames)
-app.post('/covida/groups/', covApi.createGroup)
-app.put('/covida/groups/:groupId', covApi.editGroup)
-app.get('/covida/groups/', covApi.listGroups)
-app.get('/covida/groups/:groupId', (req,res) => {
-  if(!Object.keys(req.query).length == 0) covApi.getGamesBetween(req, res)
-  else covApi.showGroup(req, res)
-})
-app.post('/covida/groups/:groupId', covApi.addToGroup)
-app.delete('/covida/groups/:groupId', (req, res) => {
-  if(!Object.keys(req.body).length == 0) covApi.removeFromGroup(req, res)
-  else covApi.deleteGroup(req, res)
-})
+app.use('/covida', covApiRouter)
+app.use('/site', covSiteRouter)
 
 app.listen(PORT, () => {
     console.log("server is running...")
