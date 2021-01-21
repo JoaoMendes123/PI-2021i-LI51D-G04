@@ -1,0 +1,24 @@
+<div class="container">
+    <h1>{{group.name}}</h1>
+    <p>{{group.description}}</p>
+    {{#each group.games}}
+        <form method="POST" action="./{{../group.id}}?_method=DELETE">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{id}}" aria-expanded="false" aria-controls="flush-collapseOne">
+                        {{name}}
+                     </button>
+                </h2>
+                <div id="flush-collapse{{id}}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body"></div>
+                        <form>
+                            <input type="hidden" id="{{id}}" name="gameID" value="{{id}}"></input>
+                            <input type="submit" class="btn btn-primary" value="Remove"></input>
+                        </form>
+                </div>
+            </div>
+            {{else}}
+            <p class="empty">This group contains no games yet</p>
+        </form>
+        {{/each}}
+</div>

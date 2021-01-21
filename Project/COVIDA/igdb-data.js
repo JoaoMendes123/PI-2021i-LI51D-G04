@@ -23,7 +23,7 @@ function searchGames(name) {
     })
     .then((res) => res.json())
     .then(res => {
-        if(res.length > 0) return JSON.stringify(res)
+        if(res.length > 0) return res
         else throw new resources.dbError(`No matches found on the search for ${name}`, 400)
     })
 }

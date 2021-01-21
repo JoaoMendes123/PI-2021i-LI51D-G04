@@ -1,0 +1,39 @@
+<script>
+    var group, form, game;
+    document.getElementById("gameID").addEventListener('click', function(){
+        game = document.getElementById.value;
+    });
+    document.getElementById("groupID").addEventListener("click", function() {
+        var newInput1;
+        form = document.createElement('form');
+        group = document.getElementById("groupID").value;
+        form.action = '/site/groups/'+group;
+        form.method = 'post';
+        newInput1 = document.createElement('input');
+        newInput1.type='hidden';
+        newInput1.name='gameID';
+        newInput1.value = game;
+        form.appendChild(newInput1);
+        document.getElementById('hidden_form_container').appendChild(form);
+        form.submit();
+    });
+</script>
+<h1>Search</h1>
+<div class="container">
+    {{#each games}}
+       <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center" style="justify-content: space-between align-items: center">
+            {{name}}
+                <div class="dropdown" style="justify-content: space-between align-items: center">
+                    <div id="hidden_form_container" style="display:none;"></div>
+                    <button id="gameID" name="gameID" class="btn btn-secondary dropdown-toggle float-right" value="{{id}}" type="button" style="float:right"id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">Add</button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {{#each ../groups}}
+                        <button class="dropdown-item" id="groupID" name="groupID" value="{{id}}">{{name}}</button>
+                        {{/each}}
+                    </ul>
+                </div>
+        </li>
+       </ul>
+    {{/each}}
+</div>

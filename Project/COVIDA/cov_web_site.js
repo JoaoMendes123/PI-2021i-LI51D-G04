@@ -1,5 +1,6 @@
 'use strict'
 
+const { response } = require('express')
 const express = require('express')
 module.exports = function (covServices) {
     if(!covServices) {
@@ -39,11 +40,13 @@ module.exports = function (covServices) {
         rsp.render('createGroup', {title: 'Create a Group'})
     }
 
-    function searchGames(req, rsp){
+    async function searchGames(req, rsp){
         if(!req.query.name) return rsp.status(422).json(new Error(`Invalid query syntax, please make sure query params are according to the documentation.`, req.originalUrl))
-        covServices.searchGames(req.query.name)
-            .then(games => sendSuccess(req,rsp,new Answer(`Displaying search results`,JSON.parse(games)),200))
-            .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
+        var games = await covServices.searchGames(req.query.name)
+        var groups = await covServices.listGroups()
+        console.log(groups)
+        rsp.render('searchView', {games: games, groups: groups})
+
     }
 
     function createGroup(req, rsp){
@@ -70,13 +73,13 @@ module.exports = function (covServices) {
     function listGroups(req, rsp){
         covServices.listGroups()
             .then(groups => rsp.render('index', { title: 'Test', groups: groups}))
-            .catch(err => rsp.render('index', { title: 'Test', groups: groups}))
+            .catch(err => console.log(err))
     }
 
     function showGroup(req, rsp){
         const groupId = req.params.groupId
         covServices.showGroup(groupId)
-            .then(succ => sendSuccess(req,rsp,new Answer(`Displaying group ${succ.name}`, succ),200))
+            .then(succ =>  rsp.render('groupView',{group: succ}))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
