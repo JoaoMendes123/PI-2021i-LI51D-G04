@@ -5,7 +5,7 @@
 <div class="container">
     <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center">
         <h1 style="text-align:left">Your Groups</h1>
-        <a class="btn btn-primary float-right" style="float:right" href="/site/groups/new" role="button">Create Group</a>
+        <button class="btn btn-primary float-right" style="float:right" type="button" data-bs-toggle="modal" data-bs-target="#createModal" role="button">Create Group</button>
     </div>
     <div class="accordion accordion-flush" id="accordionFlushExample">
         {{#each groups}}
@@ -19,7 +19,7 @@
                     <div class="accordion-body">{{description}}</div>
                         <form method="POST" action="./groups/{{id}}?_method=DELETE">
                             <a class="btn btn-primary" href="/site/groups/{{id}}" role="button">Show Group</a>
-                            <a class ="btn btn-primary" href="/site/groups/{{id}}/edit" role="button">Edit Group</a>
+                            <button type="button" class ="btn btn-primary" id="edit{{id}}" data-bs-toggle="modal" data-bs-target="#editModal" role="button">Edit Group</button>
                             <input type="submit" class="btn btn-primary" value="Delete Group"></input>
                         </form>
                 </div>
@@ -27,3 +27,92 @@
         {{/each}}
     </div>
 </div>
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="Form" method="POST" action="/site/groups">
+          <div class="mb-3">
+            <label for="min" class="col-form-label">New Name</label>
+            <input type="text" class="form-control" id="newName" name="newName" size="1">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">New Description</label>
+            <input type="text" class="form-control" id="newDesc" name="newDesc" size="1">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createModalLabel">Create new group</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="Form" method="POST">
+          <div class="mb-3">
+            <label for="min" class="col-form-label">Group Name</label>
+            <input type="text" class="form-control" id="name" name="name" size="1">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Group Description</label>
+            <input type="text" class="form-control" id="desc" name="desc" size="1">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    var editModal = document.getElementById('editModal')
+editModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-bs-* attributes
+  var recipient = button.getAttribute('data-bs-whatever')
+  // If necessary, you could initiate an AJAX request here
+  // and then do the updating in a callback.
+  //
+  // Update the modal's content.
+  var modalTitle = editModal.querySelector('.modal-title')
+  var modalBodyInput = editModal.querySelector('.modal-body input')
+})
+var createModal = document.getElementById('createModal')
+createModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-bs-* attributes
+  var recipient = button.getAttribute('data-bs-whatever')
+  // If necessary, you could initiate an AJAX request here
+  // and then do the updating in a callback.
+  //
+  // Update the modal's content.
+  var modalTitle = createModal.querySelector('.modal-title')
+  var modalBodyInput = createModal.querySelector('.modal-body input')
+})
+
+var form = document.getElementById('Form')
+{{#each groups}}
+    document.getElementById('edit{{id}}').addEventListener("click", function() {
+        form.action = '/site/groups/'+{{id}}+'?_method=PUT'
+    })
+{{/each}}
+
+</script>

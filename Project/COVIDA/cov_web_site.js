@@ -14,8 +14,6 @@ module.exports = function (covServices) {
     var methodOverride = require('method-override')
     router.use(methodOverride('_method'))
 
-    router.get('/groups/new', createGroupPage)
-    router.get('/groups/:groupId/edit', editGroupPage)
     router.get('/games/', searchGames)
     router.post('/groups/', createGroup)
     router.put('/groups/:groupId', editGroup)
@@ -30,43 +28,28 @@ module.exports = function (covServices) {
         else deleteGroup(req, res)
     })
     return router
-    
-    function editGroupPage(req, rsp){
-    
-    rsp.render('editGroup', {title: 'Edit group'})
-    }
-
-    function createGroupPage(req, rsp){
-        rsp.render('createGroup', {title: 'Create a Group'})
-    }
 
     async function searchGames(req, rsp){
-        if(!req.query.name) return rsp.status(422).json(new Error(`Invalid query syntax, please make sure query params are according to the documentation.`, req.originalUrl))
         var games = await covServices.searchGames(req.query.name)
         var groups = await covServices.listGroups()
         console.log(groups)
+        console.log(games)
         rsp.render('searchView', {games: games, groups: groups})
 
     }
 
     function createGroup(req, rsp){
-        if(!req.body.name) return rsp.status(400).json(new Error(`Invalid body syntax- Cannot find group name - Please make sure body params are according to the documentation.`, req.originalUrl))
         const groupName = req.body.name
         covServices.createGroup(groupName, req.body.desc)
             .then(succ => {
-                //sendSuccess(req,rsp,new Answer(`Group sucessfully Created.`,succ),201))
                 rsp.render('successAlert', {message: 'Group Successfully Created'})
             })
-            .catch(err => console.log(err)/*rsp.status(err.status).json(new Error(err.message, req.originalUrl))*/)
+            .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
     function editGroup(req, rsp){
-        if(!req.body.newName && !req.body.newDesc) return rsp.status(422).json(new Error(`Invalid body syntax, please make sure body params are according to the documentation.`, req.originalUrl))
         const groupId = req.params.groupId
         covServices.editGroup(groupId, req.body.newName, req.body.newDesc)
-            .then(succ => {
-                if(succ.result == 'noop') sendSuccess(req,rsp, new Answer(`Group was not modified`, succ.group), 200)
-                else sendSuccess(req,rsp,new Answer(`Group sucessfully edited.`,succ.group),200)
-            })
+            .then(succ => rsp.redirect('/site/groups/'))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
@@ -91,27 +74,23 @@ module.exports = function (covServices) {
     }
 
     function addToGroup(req, rsp){
-        if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-        if(isNaN(req.body.gameID)) return rsp.status(422).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`, req.originalUrl))
         const groupId = req.params.groupId
         covServices.addToGroup(req.body.gameID, groupId)
-            .then(res => sendSuccess(req,rsp,new Answer(`Game ${res.game} successfully added to group ${res.group.name}`, res.group),200))
+            .then(res => rsp.redirect('/site/groups/'+groupId))
             .catch((err) => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
     function removeFromGroup(req, rsp){
-        if(!req.body.gameID) return rsp.status(422).json(new Error(`Invalid body syntax - cannot find gameID - please make sure body params are according to the documentation.`, req.originalUrl))
-        if(isNaN(req.body.gameID)) return rsp.status(422).json(new Error(`${req.body.gameID} is not a valid ID. ID's must consist only of numbers.`,req.originalUrl))
         const groupId = req.params.groupId
         covServices.removeFromGroup(groupId, req.body.gameID)
-            .then(res => sendSuccess(req,rsp,new Answer(`Game ${res.game} successfully removed from group ${res.group.name}`, res.group),200) )
+            .then(res => rsp.redirect('site/groups/'+groupId))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
     function getGamesBetween(req, rsp){
         const groupId = req.params.groupId
         covServices.getGamesBetween(groupId, req.query.maxRating, req.query.minRating)
-            .then(succ => sendSuccess(req,rsp,new Answer('Games that fit interval:',succ),200))
+            .then(succ => rsp.render('groupView', {group: succ}))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 

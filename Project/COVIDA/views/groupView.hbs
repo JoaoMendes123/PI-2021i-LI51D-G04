@@ -1,6 +1,9 @@
 <div class="container">
-    <h1>{{group.name}}</h1>
-    <p>{{group.description}}</p>
+    <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center">
+    <h1 style="text-align:left">{{group.name}}</h1>
+    <button id="sort"class="btn btn-primary float-right" style="float:right" data-bs-toggle="modal" data-bs-target="#exampleModal"role="button">Sort by Rating</button>
+    </div>
+    <p style="text-align:left">{{group.description}}</p>
     {{#each group.games}}
         <form method="POST" action="./{{../group.id}}?_method=DELETE">
             <div class="accordion-item">
@@ -22,3 +25,46 @@
         </form>
         {{/each}}
 </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="GET" action="./{{group.id}}">
+          <div class="mb-3">
+            <label for="min" class="col-form-label">Min</label>
+            <input type="text" class="form-control" id="minRating" name="minRating" size="1">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Max</label>
+            <input type="text" class="form-control" id="maxRating" name="maxRating" size="1">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Sort</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var exampleModal = document.getElementById('exampleModal')
+exampleModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-bs-* attributes
+  var recipient = button.getAttribute('data-bs-whatever')
+  // If necessary, you could initiate an AJAX request here
+  // and then do the updating in a callback.
+  //
+  // Update the modal's content.
+  var modalTitle = exampleModal.querySelector('.modal-title')
+  var modalBodyInput = exampleModal.querySelector('.modal-body input')
+})
+
+</script>

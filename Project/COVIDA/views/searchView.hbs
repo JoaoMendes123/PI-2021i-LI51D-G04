@@ -1,39 +1,50 @@
-<script>
-    var group, form, game;
-    document.getElementById("gameID").addEventListener('click', function(){
-        game = document.getElementById.value;
-    });
-    document.getElementById("groupID").addEventListener("click", function() {
-        var newInput1;
-        form = document.createElement('form');
-        group = document.getElementById("groupID").value;
-        form.action = '/site/groups/'+group;
-        form.method = 'post';
-        newInput1 = document.createElement('input');
-        newInput1.type='hidden';
-        newInput1.name='gameID';
-        newInput1.value = game;
-        form.appendChild(newInput1);
-        document.getElementById('hidden_form_container').appendChild(form);
-        form.submit();
-    });
-</script>
+
+
 <h1>Search</h1>
 <div class="container">
-    {{#each games}}
+    <form id='Form' method="POST">
+    {{#each games}}  
        <ul class="list-group">
         <li class="list-group-item d-flex justify-content-between align-items-center" style="justify-content: space-between align-items: center">
             {{name}}
                 <div class="dropdown" style="justify-content: space-between align-items: center">
-                    <div id="hidden_form_container" style="display:none;"></div>
-                    <button id="gameID" name="gameID" class="btn btn-secondary dropdown-toggle float-right" value="{{id}}" type="button" style="float:right"id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">Add</button>
+                    <button id="{{id}}" name="gameID" class="btn btn-secondary dropdown-toggle float-right" type="button" style="float:right" data-bs-toggle="dropdown" aria-expanded="false">Add to Group</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         {{#each ../groups}}
-                        <button class="dropdown-item" id="groupID" name="groupID" value="{{id}}">{{name}}</button>
+                        <button type="button" class="dropdown-item" id="{{id}}" name="{{id}}">{{name}}</button>
                         {{/each}}
                     </ul>
                 </div>
         </li>
        </ul>
     {{/each}}
+    </form>
 </div>
+<script>
+    var elem = document.querySelectorAll('[class = "dropdown-item"]')
+    var i = 0
+    var newInput;
+    var form = document.getElementById('Form')
+    {{#each games}}
+        document.getElementById({{id}}).addEventListener("mousedown", function(){
+            for(i; i<elem.length; i++){
+                elem[i].id = i
+            }
+            newInput = document.createElement('input')
+            newInput.type = 'hidden'
+            newInput.name = 'gameID'
+            newInput.value = {{id}}
+        })
+    {{/each}}
+    elem.forEach(e => {
+        e.addEventListener("click", function(){
+            var groupID = document.createElement('input')
+            groupID.type = 'hidden'
+            groupID.name = 'groupID'
+            groupID.value = e.name
+            form.action="../groups/"+groupID.value
+            form.appendChild(newInput)
+            form.submit()
+        })
+    })
+</script> 
