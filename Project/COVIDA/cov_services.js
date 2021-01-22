@@ -1,11 +1,13 @@
 'use strict'
 const igdb = require('./igdb-data')
 const {dbGame} = require('./resources')
-module.exports = function(covDB) {
+module.exports = function(covDB,usersDB) {
     if(!covDB) {
       throw "Invalid covDB object"
     }
-    
+    if(!usersDB) {
+        throw "Invalid usersDB object"
+    }
     return{
         searchGames:searchGames,
         createGroup:createGroup,
@@ -15,7 +17,8 @@ module.exports = function(covDB) {
         deleteGroup: deleteGroup,
         addToGroup:addToGroup,
         removeFromGroup:removeFromGroup,
-        getGamesBetween:getGamesBetween
+        getGamesBetween:getGamesBetween,
+        verifyLoginCredentials:verifyLoginCredentials
     }
 
 
@@ -149,4 +152,17 @@ module.exports = function(covDB) {
         }
         return array;
         }
+
+    function verifyLoginCredentials(credentials){
+        return new Promise((resolve,reject) => {
+            usersDB.getUser(credentials.email)
+            .then(user => {
+                let status = !user || user.password != credentials.password ?
+                {validCredentials : false, error: "Invalid user credentials"} :
+                {validCredentials : true}
+                resolve(status)
+            })
+            .catch((err) => reject(err))
+        })
+    }
 } 
