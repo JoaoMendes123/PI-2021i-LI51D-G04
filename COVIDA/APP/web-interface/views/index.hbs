@@ -1,7 +1,14 @@
-<form class="d-flex" method="GET" action="/site/games/?name={{name}}">
-        <input class="form-control" type="text" name="name" id="id" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-</form>
+<header>
+  <nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/site/groups">COVIDA</a>
+    <form class="d-flex" method="GET" action="/site/games/?name={{name}}">
+      <input class="form-control me-2" type="text" name="name" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+</header>
 <div class="container">
     <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center">
         <h1 style="text-align:left">Your Groups</h1>
@@ -73,7 +80,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Edit</button>
+        <button type="submit" class="btn btn-primary">Create</button>
         </form>
       </div>
     </div>

@@ -1,10 +1,10 @@
- <div class="row">
+<div class="row">
     <aside class="col-sm-4">
-      <p>Login</p>
+      <p>Register</p>
       <div class="card">
         <article class="card-body">
-          <a href="" class="float-right btn btn-outline-primary">Sign up</a>
-          <h4 class="card-title mb-4 mt-1">Sign in</h4>
+          Already have an account? <a href="/users/login">Sign in</a>
+          <h4 class="card-title mb-4 mt-1">Sign up</h4>
           {{#if warning}}
           <div class="alert alert-warning alert-dismissible fade show" role="alert">
             {{warning}}
@@ -12,23 +12,21 @@
           </div>
           {{/if}}
 
-          <form method="POST" action="/users/login">
+          <form method="POST" action="/users/register">
             <div class="form-group">
               <label>Your email</label>
               <input name="email" class="form-control" placeholder="Insert Email here" value="{{username}}" type="email">
             </div> <!-- form-group// -->
             <div class="form-group">
-              <a class="float-right" href="#">Forgot?</a>
               <label>Your password</label>
               <input name="password" class="form-control" placeholder="******" type="password">
             </div> <!-- form-group// -->
             <div class="form-group">
               <div class="checkbox">
-                <label> <input type="checkbox"> Save password </label>
               </div> <!-- checkbox .// -->
             </div> <!-- form-group// -->
             <div class="form-group">
-              <button type="submit" class="btn btn-primary btn-block"> Login </button>
+              <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
             </div> <!-- form-group// -->
           </form>
         </article>
