@@ -1,11 +1,23 @@
+<header>
+  <nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/site/groups">COVIDA</a>
+    <form class="d-flex" method="GET" action="/site/games/?name={{name}}">
+      <input class="form-control me-2" type="text" name="name" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+</header>
 <div class="container">
     <div style="display:flex; flex-direction: row; justify-content: space-between; align-items: center">
     <h1 style="text-align:left">{{group.name}}</h1>
+    <a id = "return" style="visibility:hidden" href="/site/groups/{{group.id}}">Groups sorted by rating, to return to normal group view click here</a>
     <button id="sort"class="btn btn-primary float-right" style="float:right" data-bs-toggle="modal" data-bs-target="#exampleModal"role="button">Sort by Rating</button>
     </div>
     <p style="text-align:left">{{group.description}}</p>
     {{#each group.games}}
-        <form method="POST" action="./{{../group.id}}?_method=DELETE">
+        <form method="POST" action="/site/groups/{{../group.id}}?_method=DELETE">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="flush-headingOne">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{id}}" aria-expanded="false" aria-controls="flush-collapseOne">
@@ -66,5 +78,4 @@ exampleModal.addEventListener('show.bs.modal', function (event) {
   var modalTitle = exampleModal.querySelector('.modal-title')
   var modalBodyInput = exampleModal.querySelector('.modal-body input')
 })
-
 </script>
