@@ -42,14 +42,14 @@ module.exports = function (covServices) {
         const groupName = req.body.name
         covServices.createGroup(groupName, req.body.desc, req.user.username)
             .then(succ => {
-                rsp.render('successAlert', { message: 'Group Successfully Created' })
+                rsp.render('successAlert', { message: 'Group Successfully Created', redirect: '/site/groups'  })
             })
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
     function editGroup(req, rsp) {
         const groupId = req.params.groupId
         covServices.editGroup(groupId, req.body.newName, req.body.newDesc)
-            .then(succ => rsp.render('successAlert', { message: 'Group successfully edited' }))
+            .then(succ => rsp.render('successAlert', { message: 'Group successfully edited', redirect: '/site/groups' }))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
@@ -70,21 +70,21 @@ module.exports = function (covServices) {
     function deleteGroup(req, rsp) {
         const groupID = req.params.groupId
         covServices.deleteGroup(groupID)
-            .then(succ => rsp.render('successAlert', { message: 'Group successfully removed' }))
+            .then(succ => rsp.render('successAlert', { message: 'Group successfully removed', redirect: '/site/groups/'}))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 
     function addToGroup(req, rsp) {
         const groupId = req.params.groupId
         covServices.addToGroup(req.body.gameID, groupId)
-            .then(res => rsp.render('successAlert', { message: 'Group successfully edited' }))
-            .catch((err) => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
+            .then(res => rsp.render('successAlert', { message: 'Game successfully added', redirect: '/site/groups/'+groupId }))
+            .catch((err) => rsp.render('failAlert', {message:'Game is already in group', redirect: '/site/groups/'+groupId }))
     }
 
     function removeFromGroup(req, rsp) {
         const groupId = req.params.groupId
         covServices.removeFromGroup(groupId, req.body.gameID)
-            .then(res => rsp.redirect('/site/groups/' + groupId))
+            .then(res => rsp.render('successAlert', { message: 'Game successfully removed', redirect: '/site/groups/'+groupId }))
             .catch(err => rsp.status(err.status).json(new Error(err.message, req.originalUrl)))
     }
 

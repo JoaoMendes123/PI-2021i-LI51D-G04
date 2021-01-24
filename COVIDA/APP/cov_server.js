@@ -47,10 +47,14 @@ app.use(function (err, req, rsp, next) {
     rsp.status(400).json("Error parsing body, body is not a valid JSON object.")
   } else next()
 })
+
+
 app.get('/covida', checkAPI)
 app.use('/covida', covApiRouter)
 app.use('/site', verifyAuthenticated, covSiteRouter)
 app.use('/users', usersSiteRouter)
+
+sitemap.swagger('COVIDA API', app)
 
 app.listen(PORT, () => {
   console.log("server is running...")

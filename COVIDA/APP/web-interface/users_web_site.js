@@ -48,6 +48,6 @@ module.exports = function (covServices) {
         console.log(res)
         if(res === 'registered') rsp.redirect('/users/login')
       })
-      .catch(err => console.log())
+      .catch(err => rsp.render('register', {warning: "An account with that e-mail already exists"}))
   }
 }
